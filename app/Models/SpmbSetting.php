@@ -10,6 +10,7 @@ class SpmbSetting extends Model
     use HasFactory;
 
     protected $fillable = [
+        'tahun_ajaran_id',
         'tahun_ajaran',
         'gelombang',
         'pendaftaran_mulai',

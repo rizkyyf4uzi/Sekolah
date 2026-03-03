@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\SiswaController;
 use App\Http\Controllers\Admin\GuruController;
 use App\Http\Controllers\Admin\GuruAccountController;
 use App\Http\Controllers\Admin\AbsensiController;
+use App\Http\Controllers\Admin\AbsensiGuruController;
 use App\Http\Controllers\Admin\TahunAjaranController;
 use App\Http\Controllers\Admin\SpmbController as AdminSpmbController;
 use App\Http\Controllers\Admin\SpmbSettingController;
@@ -151,8 +152,18 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'admin']
         Route::get('/{id}/edit', [AbsensiController::class, 'edit'])->name('edit');
         Route::put('/{id}', [AbsensiController::class, 'update'])->name('update');
         Route::delete('/{id}', [AbsensiController::class, 'destroy'])->name('destroy');
+        Route::get('/detail', [AbsensiController::class, 'detail'])->name('detail');
         Route::get('/fill', [AbsensiController::class, 'fill'])->name('fill');
         Route::post('/store-batch', [AbsensiController::class, 'storeBatch'])->name('store-batch');
+    });
+
+    // Absensi Guru
+    Route::prefix('absensi-guru')->name('absensi-guru.')->group(function () {
+        Route::get('/', [AbsensiGuruController::class, 'index'])->name('index');
+        Route::get('/rekap', [AbsensiGuruController::class, 'rekap'])->name('rekap');
+        Route::get('/fill', [AbsensiGuruController::class, 'fill'])->name('fill');
+        Route::post('/store-batch', [AbsensiGuruController::class, 'storeBatch'])->name('store-batch');
+        Route::get('/detail', [AbsensiGuruController::class, 'detail'])->name('detail');
     });
 
     Route::prefix('tahun-ajaran')->name('tahun-ajaran.')->group(function () {

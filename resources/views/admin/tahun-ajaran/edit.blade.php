@@ -1,8 +1,8 @@
 @extends('layouts.admin')
 
-@section('title', 'Tambah Tahun Ajaran')
+@section('title', 'Edit Tahun Ajaran')
 
-@section('breadcrumb', 'Master Data / Tahun Ajaran / Tambah')
+@section('breadcrumb', 'Master Data / Tahun Ajaran / Edit')
 
 @section('content')
 <div class="max-w-4xl mx-auto">
@@ -11,11 +11,11 @@
             <div class="flex items-start justify-between gap-4 mb-8">
                 <div class="flex items-center gap-4">
                     <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                        <span class="material-symbols-outlined">calendar_add_on</span>
+                        <span class="material-symbols-outlined">edit_calendar</span>
                     </div>
                     <div>
-                        <h2 class="text-lg font-bold text-slate-800">Informasi Tahun Ajaran</h2>
-                        <p class="text-sm text-slate-500">Silahkan lengkapi data tahun ajaran baru di bawah ini.</p>
+                        <h2 class="text-lg font-bold text-slate-800">Edit Tahun Ajaran</h2>
+                        <p class="text-sm text-slate-500">Perbarui data periode akademik yang dipilih.</p>
                     </div>
                 </div>
 
@@ -26,8 +26,9 @@
                 </a>
             </div>
 
-            <form action="{{ route('admin.tahun-ajaran.store') }}" method="POST" id="mainForm" class="space-y-6">
+            <form action="{{ route('admin.tahun-ajaran.update', $tahunAjaran) }}" method="POST" id="mainForm" class="space-y-6">
                 @csrf
+                @method('PUT')
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="md:col-span-2">
@@ -39,7 +40,7 @@
                             <input
                                 id="tahun_ajaran"
                                 name="tahun_ajaran"
-                                value="{{ old('tahun_ajaran') }}"
+                                value="{{ old('tahun_ajaran', $tahunAjaran->tahun_ajaran) }}"
                                 required
                                 type="text"
                                 placeholder="Contoh: 2024/2025"
@@ -63,7 +64,7 @@
                             <input
                                 id="tanggal_mulai"
                                 name="tanggal_mulai"
-                                value="{{ old('tanggal_mulai') }}"
+                                value="{{ old('tanggal_mulai', $tahunAjaran->tanggal_mulai->format('Y-m-d')) }}"
                                 required
                                 type="date"
                                 @class([
@@ -85,7 +86,7 @@
                             <input
                                 id="tanggal_selesai"
                                 name="tanggal_selesai"
-                                value="{{ old('tanggal_selesai') }}"
+                                value="{{ old('tanggal_selesai', $tahunAjaran->tanggal_selesai->format('Y-m-d')) }}"
                                 required
                                 type="date"
                                 @class([
@@ -111,7 +112,7 @@
                                     name="semester"
                                     type="radio"
                                     value="Ganjil"
-                                    {{ old('semester') == 'Ganjil' ? 'checked' : '' }}
+                                    {{ old('semester', $tahunAjaran->semester) == 'Ganjil' ? 'checked' : '' }}
                                     required
                                 />
                                 <div class="ml-4">
@@ -128,7 +129,7 @@
                                     name="semester"
                                     type="radio"
                                     value="Genap"
-                                    {{ old('semester') == 'Genap' ? 'checked' : '' }}
+                                    {{ old('semester', $tahunAjaran->semester) == 'Genap' ? 'checked' : '' }}
                                     required
                                 />
                                 <div class="ml-4">
@@ -148,7 +149,7 @@
                                 <p class="text-sm text-slate-600 font-medium">Jadikan periode ini sebagai periode aktif sistem</p>
                             </div>
                             <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" name="is_aktif" value="1" {{ old('is_aktif') ? 'checked' : '' }} class="sr-only peer">
+                                <input type="checkbox" name="is_aktif" value="1" {{ old('is_aktif', $tahunAjaran->is_aktif) ? 'checked' : '' }} class="sr-only peer">
                                 <div class="w-14 h-7 bg-slate-200 peer-focus:outline-none peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary shadow-inner rounded-full"></div>
                             </label>
                         </div>
@@ -162,7 +163,7 @@
                             rows="3"
                             placeholder="Tambahkan catatan khusus periode ini..."
                             class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
-                        >{{ old('keterangan') }}</textarea>
+                        >{{ old('keterangan', $tahunAjaran->keterangan) }}</textarea>
                     </div>
                 </div>
 
@@ -176,7 +177,7 @@
                         class="w-full sm:w-auto px-10 py-3 bg-primary text-white rounded-xl font-bold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
                     >
                         <span class="material-symbols-outlined text-xl">save</span>
-                        <span id="btnText">Simpan Tahun Ajaran</span>
+                        <span id="btnText">Simpan Perubahan</span>
                         <span id="spinner" class="hidden">
                             <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -186,18 +187,6 @@
                     </button>
                 </div>
             </form>
-        </div>
-    </div>
-
-    <div class="mt-6 bg-lavender/30 border border-primary/10 rounded-2xl p-6">
-        <div class="flex gap-4">
-            <span class="material-symbols-outlined text-primary">info</span>
-            <div>
-                <h4 class="text-sm font-bold text-primary mb-1">Catatan Penting</h4>
-                <p class="text-xs text-slate-600 leading-relaxed">
-                    Menambahkan tahun ajaran baru tidak akan langsung menonaktifkan tahun ajaran yang sedang berjalan. Anda dapat mengubah status keaktifan melalui menu daftar Tahun Ajaran setelah data berhasil disimpan.
-                </p>
-            </div>
         </div>
     </div>
 </div>
@@ -215,7 +204,7 @@
 
         // Form Submission Overlay
         form.addEventListener('submit', function() {
-            btnText.textContent = 'Memproses...';
+            btnText.textContent = 'Memperbarui...';
             spinner.classList.remove('hidden');
         });
 
@@ -247,18 +236,6 @@
             validateDates();
         });
         tanggalSelesai.addEventListener('change', validateDates);
-
-        // Auto-generate current/next academic year if empty
-        if (!tahunAjaranInput.value) {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = now.getMonth() + 1;
-            if (month >= 7) {
-                tahunAjaranInput.value = `${year}/${year + 1}`;
-            } else {
-                tahunAjaranInput.value = `${year - 1}/${year}`;
-            }
-        }
     });
 </script>
 @endpush

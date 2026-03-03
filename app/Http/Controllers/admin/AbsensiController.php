@@ -17,101 +17,64 @@ class AbsensiController extends Controller
     public function index(Request $request)
     {
         try {
-            // ===== FIX FILTER: HAPUS RANGE, GANTI DENGAN MODE YANG JELAS =====
-            $query = Absensi::with(['siswa', 'guru'])
-                ->orderBy('tanggal', 'desc')
-                ->orderBy('created_at', 'desc');
+            // ===== MODIFIED: GROUPED RESULTS FOR 100% PARITY WITH MOCKUP =====
+            $query = Absensi::join('siswas', 'absensi.siswa_id', '=', 'siswas.id')
+                ->leftJoin('tahun_ajarans', 'siswas.tahun_ajaran_id', '=', 'tahun_ajarans.id')
+                ->select(
+                    'absensi.tanggal',
+                    'siswas.kelompok',
+                    'tahun_ajarans.semester',
+                    DB::raw('COUNT(CASE WHEN absensi.status = "hadir" THEN 1 END) as hadir'),
+                    DB::raw('COUNT(CASE WHEN absensi.status = "sakit" THEN 1 END) as sakit'),
+                    DB::raw('COUNT(CASE WHEN absensi.status = "izin" THEN 1 END) as izin'),
+                    DB::raw('COUNT(CASE WHEN absensi.status = "alpa" THEN 1 END) as alpa'),
+                    DB::raw('MAX(absensi.created_at) as latest_created_at')
+                )
+                ->groupBy('absensi.tanggal', 'siswas.kelompok', 'tahun_ajarans.semester')
+                ->orderBy('absensi.tanggal', 'desc')
+                ->orderBy('siswas.kelompok', 'asc');
 
-            // FILTER KELOMPOK (bisa kosong = semua)
+            // FILTER KELOMPOK
             if ($request->filled('kelompok')) {
-                $query->whereHas('siswa', function($q) use ($request) {
-                    $q->where('kelompok', $request->kelompok);
-                });
+                $query->where('siswas.kelompok', $request->kelompok);
             }
 
-            // FILTER TANGGAL: Lebih jelas pilihannya
+            // FILTER TANGGAL
             if ($request->filled('tanggal')) {
-                // Tanggal spesifik
-                $query->whereDate('tanggal', $request->tanggal);
+                $query->whereDate('absensi.tanggal', $request->tanggal);
             } elseif ($request->filled('bulan')) {
-                // Filter per bulan
-                $query->whereYear('tanggal', Carbon::parse($request->bulan)->year)
-                    ->whereMonth('tanggal', Carbon::parse($request->bulan)->month);
+                $query->whereYear('absensi.tanggal', Carbon::parse($request->bulan)->year)
+                    ->whereMonth('absensi.tanggal', Carbon::parse($request->bulan)->month);
             }
-            // Kalo ga pilih filter tanggal, tampilkan semua (default)
 
             $absensi = $query->paginate(20)->withQueryString();
             
-            // ===== STATISTIK YANG RELEVAN =====
-            // Jangan pake "hari ini" terus, sesuaikan dengan filter
-            if ($request->filled('tanggal')) {
-                // Statistik untuk tanggal tertentu
-                $statistik_tanggal = [
-                    'hadir' => Absensi::whereDate('tanggal', $request->tanggal)->where('status', 'hadir')->count(),
-                    'izin' => Absensi::whereDate('tanggal', $request->tanggal)->where('status', 'izin')->count(),
-                    'sakit' => Absensi::whereDate('tanggal', $request->tanggal)->where('status', 'sakit')->count(),
-                    'tidak_hadir' => Absensi::whereDate('tanggal', $request->tanggal)->where('status', 'tidak_hadir')->count(),
-                ];
-            } else {
-                // Statistik global
-                $statistik_tanggal = null;
-            }
-
-            // Statistik umum (selalu ada)
+            // ===== STATISTIK GLOBAL =====
             $total_absensi = Absensi::count();
             $total_hadir = Absensi::where('status', 'hadir')->count();
             $total_izin_sakit = Absensi::whereIn('status', ['izin', 'sakit'])->count();
-            $total_tidak_hadir = Absensi::where('status', 'tidak_hadir')->count();
+            $total_tidak_hadir = Absensi::where('status', 'alpa')->count();
             
             $persen_hadir = $total_absensi > 0 
                 ? round(($total_hadir / $total_absensi) * 100, 1) 
                 : 0;
 
-            // ===== DATA GURU PER KELOMPOK =====
-            $guru_kelompok_a = Guru::where('kelompok', 'A')->first();
-            $guru_kelompok_b = Guru::where('kelompok', 'B')->first();
-
-            // Chart 7 hari terakhir
-            $sevenDaysAgo = Carbon::today()->subDays(7);
-            $chart_7_hari = Absensi::select(
-                    DB::raw('DATE(tanggal) as tanggal'),
-                    DB::raw('COUNT(CASE WHEN status = "hadir" THEN 1 END) as hadir'),
-                    DB::raw('COUNT(CASE WHEN status = "tidak_hadir" THEN 1 END) as tidak_hadir')
-                )
-                ->where('tanggal', '>=', $sevenDaysAgo)
-                ->groupBy(DB::raw('DATE(tanggal)'))
-                ->orderBy('tanggal')
-                ->get()
-                ->map(function($item) {
-                    $item->tanggal = Carbon::parse($item->tanggal)->format('d/m');
-                    return $item;
-                });
-
-            // Status distribution
             $status_distribution = [
-                Absensi::where('status', 'hadir')->count(),
+                $total_hadir,
                 Absensi::where('status', 'izin')->count(),
                 Absensi::where('status', 'sakit')->count(),
-                Absensi::where('status', 'tidak_hadir')->count(),
+                $total_tidak_hadir,
             ];
 
-            // Data untuk view
-            $data = [
+            return view('admin.absensi.index', [
                 'absensi' => $absensi,
                 'total_absensi' => $total_absensi,
                 'total_hadir' => $total_hadir,
                 'total_izin_sakit' => $total_izin_sakit,
                 'total_tidak_hadir' => $total_tidak_hadir,
                 'persen_hadir' => $persen_hadir,
-                'chart_7_hari' => $chart_7_hari,
                 'status_distribution' => $status_distribution,
-                'guru_kelompok_a' => $guru_kelompok_a,
-                'guru_kelompok_b' => $guru_kelompok_b,
-                'statistik_tanggal' => $statistik_tanggal,
-                'pendaftaran_baru' => 0 // atau ambil dari model Spmb
-            ];
-
-            return view('admin.absensi.index', $data);
+            ]);
             
         } catch (\Exception $e) {
             \Log::error('Error in AbsensiController@index: ' . $e->getMessage());
@@ -123,12 +86,7 @@ class AbsensiController extends Controller
                 'total_izin_sakit' => 0,
                 'total_tidak_hadir' => 0,
                 'persen_hadir' => 0,
-                'chart_7_hari' => collect(),
                 'status_distribution' => [0,0,0,0],
-                'guru_kelompok_a' => null,
-                'guru_kelompok_b' => null,
-                'statistik_tanggal' => null,
-                'pendaftaran_baru' => 0
             ]);
         }
     }
@@ -151,7 +109,7 @@ class AbsensiController extends Controller
                 'status' => $absensi->status,
                 'keterangan' => $absensi->keterangan,
                 'guru_id' => $absensi->guru_id,
-                'guru_list' => $guru_list // TAMBAHKAN INI
+                'guru_list' => $guru_list
             ]);
         } catch (\Exception $e) {
             \Log::error('Error in AbsensiController@edit: ' . $e->getMessage());
@@ -166,7 +124,7 @@ class AbsensiController extends Controller
     {
         $request->validate([
             'tanggal' => 'required|date',
-            'status' => 'required|in:hadir,izin,sakit,tidak_hadir',
+            'status' => 'required|in:hadir,izin,sakit,alpa',
             'keterangan' => 'nullable|string|max:255'
         ]);
 
@@ -223,6 +181,33 @@ class AbsensiController extends Controller
         }
     }
 
+    public function detail(Request $request)
+    {
+        $tanggal = $request->get('tanggal', now()->format('Y-m-d'));
+        $kelompok = $request->get('kelompok', '');
+
+        $query = Siswa::with('tahunAjaran')->orderBy('nama_lengkap');
+        if (!empty($kelompok)) {
+            $query->where('kelompok', $kelompok);
+        }
+        $siswa = $query->get();
+        $total = $siswa->count();
+
+        $existing = Absensi::whereIn('siswa_id', $siswa->pluck('id'))
+            ->whereDate('tanggal', $tanggal)
+            ->get()
+            ->keyBy('siswa_id');
+
+        $stats = [
+            'hadir' => $existing->where('status', 'hadir')->count(),
+            'sakit' => $existing->where('status', 'sakit')->count(),
+            'izin' => $existing->where('status', 'izin')->count(),
+            'tidak_hadir' => $existing->where('status', 'alpa')->count(),
+        ];
+
+        return view('admin.absensi.detail', compact('siswa', 'tanggal', 'kelompok', 'existing', 'stats', 'total'));
+    }
+
     /**
      * Show the bulk input (fill) form that lists students for a chosen date/kelompok
      */
@@ -255,7 +240,7 @@ class AbsensiController extends Controller
             'tanggal', 
             'kelompok', 
             'existing',
-            'guru' // <-- KIRIM KE VIEW
+            'guru'
         ));
     }
 
@@ -264,9 +249,9 @@ class AbsensiController extends Controller
         $request->validate([
             'tanggal' => 'required|date',
             'kelompok' => 'nullable|string',
-            'guru_id' => 'nullable|exists:gurus,id', // <-- TAMBAHKAN VALIDASI
+            'guru_id' => 'nullable|exists:gurus,id',
             'statuses' => 'required|array',
-            'statuses.*' => 'in:hadir,izin,sakit,tidak_hadir,alpa',
+            'statuses.*' => 'in:hadir,izin,sakit,alpa',
             'keterangan' => 'nullable|array',
             'keterangan.*' => 'nullable|string|max:255',
         ]);
@@ -275,20 +260,14 @@ class AbsensiController extends Controller
         try {
             $tanggal = $request->tanggal;
             
-            // ===== PAKAI GURU_ID DARI FORM, JANGAN DICARI LAGI! =====
-            $guruId = $request->guru_id; // LANGSUNG PAKAI DARI FORM
+            $guruId = $request->guru_id;
             
-            // Fallback: cari berdasarkan kelompok kalau kosong
             if (!$guruId && $request->kelompok) {
                 $guru = Guru::where('kelompok', $request->kelompok)->first();
                 $guruId = $guru ? $guru->id : null;
             }
 
             foreach ($request->statuses as $siswaId => $status) {
-                if ($status === 'alpa') {
-                    $status = 'tidak_hadir';
-                }
-
                 $keterangan = $request->keterangan[$siswaId] ?? null;
                 
                 Absensi::updateOrCreate(
@@ -296,7 +275,7 @@ class AbsensiController extends Controller
                     [
                         'status' => $status, 
                         'keterangan' => $keterangan, 
-                        'guru_id' => $guruId  // <-- SEKARANG PASTI BENAR!
+                        'guru_id' => $guruId
                     ]
                 );
             }
@@ -304,7 +283,7 @@ class AbsensiController extends Controller
             DB::commit();
 
             return redirect()->route('admin.absensi.index')
-                ->with('success', 'Absensi berhasil disimpan untuk kelompok ' . $request->kelompok . ' dengan guru ' . ($guru->nama ?? ''));
+                ->with('success', 'Absensi berhasil disimpan untuk kelompok ' . $request->kelompok);
                 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -403,7 +382,7 @@ class AbsensiController extends Controller
                 'hadir' => Absensi::where('status', 'hadir')->count(),
                 'izin' => Absensi::where('status', 'izin')->count(),
                 'sakit' => Absensi::where('status', 'sakit')->count(),
-                'tidak_hadir' => Absensi::where('status', 'tidak_hadir')->count(),
+                'tidak_hadir' => Absensi::where('status', 'alpa')->count(),
             ];
 
             return view('admin.absensi.rekap', compact('rekap_data', 'statistik'));
@@ -416,10 +395,6 @@ class AbsensiController extends Controller
         }
     }
 
-    /**
-     * API untuk mendapatkan guru berdasarkan kelompok
-     * Dipanggil via AJAX dari view
-     */
     public function getGuruByKelompok(Request $request)
     {
         $kelompok = $request->kelompok;

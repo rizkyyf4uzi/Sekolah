@@ -43,7 +43,7 @@
                 <span class="material-symbols-outlined text-lg">how_to_reg</span>
                 <span class="text-sm nav-text whitespace-nowrap">Absensi Siswa</span>
             </a>
-            <a class="nav-item flex items-center gap-3 px-4 py-2.5 text-white/80 hover:bg-white/10 hover:text-white rounded-xl transition-all" href="{{ route('admin.absensi.index') }}" title="Absensi Guru">
+            <a class="nav-item flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.absensi-guru.*') ? 'bg-white/20 text-white font-medium shadow-sm' : 'text-white/80 hover:bg-white/10 hover:text-white' }} rounded-xl transition-all" href="{{ route('admin.absensi-guru.index') }}" title="Absensi Guru">
                 <span class="material-symbols-outlined text-lg">badge</span>
                 <span class="text-sm nav-text whitespace-nowrap">Absensi Guru</span>
             </a>
@@ -106,7 +106,7 @@
         @if(auth()->user() && in_array(auth()->user()->role, ['admin', 'super_admin']))
         <div class="space-y-1">
             <div class="nav-section-divider"></div>
-            <h3 class="nav-section-title px-4 text-[10px] font-black text-white/60 uppercase tracking-widest mb-3 flex items-center gap-2 whitespace-nowrap">⚙ E. Manajemen Sistem</h3>
+            <h3 class="nav-section-title px-4 text-[10px] font-black text-white/60 uppercase tracking-widest mb-3 flex items-center gap-2 whitespace-nowrap">⚙ E. Manajemen Sistem (Admin Only)</h3>
             <a class="nav-item flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.accounts.*') ? 'bg-white/20 text-white font-medium shadow-sm' : 'text-white/80 hover:bg-white/10 hover:text-white' }} rounded-xl transition-all" href="{{ route('admin.accounts.index') }}" title="Kelola User">
                 <span class="material-symbols-outlined text-lg">manage_accounts</span>
                 <span class="text-sm nav-text whitespace-nowrap">Kelola User</span>

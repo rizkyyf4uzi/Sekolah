@@ -1,189 +1,188 @@
 @extends('layouts.admin')
 
-@section('title', 'Isi Absensi')
-@section('breadcrumb', 'Isi Absensi Siswa')
-
-@push('meta')
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+@push('styles')
+<style type="text/tailwindcss">
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+</style>
 @endpush
 
 @section('content')
-<div class="min-h-screen bg-gray-50 p-3 sm:p-4 md:p-6">
-    <div class="max-w-4xl mx-auto">
-        <div class="mb-6 sm:mb-8">
-            <div class="flex items-start justify-between mb-4">
-                <div>
-                    <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-1">Isi Absensi</h1>
-                    <p class="text-gray-600 text-sm sm:text-base">Pilih tanggal dan kelompok lalu isi status kehadiran siswa</p>
-                </div>
-                <div class="flex items-center gap-2">
-                    <a href="{{ route('admin.absensi.index') }}" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm">Kembali</a>
-                </div>
+<nav aria-label="Breadcrumb" class="flex mb-4 text-xs font-medium text-slate-400 uppercase tracking-widest">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li><a class="hover:text-primary" href="{{ route('admin.dashboard') }}">Akademik</a></li>
+        <li><span class="mx-2">/</span></li>
+        <li><a class="hover:text-primary" href="{{ route('admin.absensi.index') }}">Absensi Siswa</a></li>
+        <li><span class="mx-2">/</span></li>
+        <li class="text-slate-600">Input Absensi</li>
+    </ol>
+</nav>
+
+<!-- Configuration Card (Select Date & Kelompok) -->
+<div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm mb-8">
+    <form method="GET" action="{{ route('admin.absensi.fill') }}" class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+        <div class="space-y-2">
+            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Pilih Tanggal</label>
+            <div class="relative">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">calendar_today</span>
+                <input type="date" name="tanggal" value="{{ $tanggal }}" 
+                       class="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 text-sm transition-all cursor-pointer"
+                       onchange="this.form.submit()">
             </div>
-
-            <div class="bg-white rounded-lg p-4 sm:p-6 mb-6">
-                <form method="GET" action="{{ route('admin.absensi.fill') }}">
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div>
-                            <label class="text-xs text-gray-700">Tanggal</label>
-                            <input type="text" name="tanggal" id="fill-tanggal" value="{{ $tanggal }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
-                        </div>
-                        <div>
-                            <label class="text-xs text-gray-700">Kelompok</label>
-                            <select name="kelompok" id="kelompok-select" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" onchange="loadGuruByKelompok()">
-                                <option value="" {{ $kelompok == '' ? 'selected' : '' }}>Semua Kelompok</option>
-                                <option value="A" {{ $kelompok == 'A' ? 'selected' : '' }}>Kelompok A</option>
-                                <option value="B" {{ $kelompok == 'B' ? 'selected' : '' }}>Kelompok B</option>
-                                <option value="Bermain" {{ $kelompok == 'Bermain' ? 'selected' : '' }}>Kelompok Bermain</option>
-                            </select>
-                        </div>
-                        <div class="flex items-end">
-                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg">Tampilkan Siswa</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-
-            {{-- TAMPILKAN INFO GURU --}}
-            @if($kelompok && isset($guru) && $guru)
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex items-start">
-                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
-                    <i class="fas fa-chalkboard-teacher text-blue-600"></i>
-                </div>
-                <div>
-                    <h3 class="font-medium text-blue-800">Guru Kelompok {{ $kelompok }}</h3>
-                    <p class="text-sm text-blue-700">{{ $guru->nama }} (NIP: {{ $guru->nip ?? '-' }})</p>
-                    <p class="text-xs text-blue-600 mt-1">Absensi akan dicatat atas nama guru ini</p>
-                </div>
-            </div>
-            @endif
-
-            <form method="POST" action="{{ route('admin.absensi.store-batch') }}">
-                @csrf
-                <input type="hidden" name="tanggal" value="{{ $tanggal }}">
-                <input type="hidden" name="kelompok" value="{{ $kelompok }}">
-                
-                {{-- 🔥 INI YANG KURANG! TAMBAHKAN GURU_ID --}}
-                @if(isset($guru) && $guru)
-                <input type="hidden" name="guru_id" value="{{ $guru->id }}">
-                @endif
-
-                <div class="bg-white rounded-lg shadow p-4 sm:p-6">
-                    <div class="mb-3 sm:mb-4 flex items-center justify-between">
-                        <h2 class="font-semibold text-gray-800">Daftar Siswa ({{ $siswa->count() }})</h2>
-                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
-                            <i class="fas fa-save mr-2"></i>Simpan Semua
-                        </button>
-                    </div>
-
-                    @if($siswa->isEmpty())
-                        <div class="text-center text-gray-500 py-8">
-                            <i class="fas fa-users text-gray-300 text-4xl mb-3"></i>
-                            <p>Tidak ada siswa untuk kelompok ini.</p>
-                            @if($kelompok)
-                            <p class="text-sm text-gray-400 mt-2">Pastikan kelompok {{ $kelompok }} memiliki siswa terdaftar</p>
-                            @endif
-                        </div>
-                    @else
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">No</th>
-                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
-                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Kelompok</th>
-                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Keterangan</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    @foreach($siswa as $i => $s)
-                                    <tr>
-                                        <td class="px-3 py-2 text-sm text-gray-700">{{ $i + 1 }}</td>
-                                        <td class="px-3 py-2 text-sm text-gray-900">{{ $s->nama_lengkap ?? $s->nama }}</td>
-                                        <td class="px-3 py-2 text-sm text-gray-700">
-                                            <span class="px-2 py-1 bg-{{ $s->kelompok == 'A' ? 'blue' : ($s->kelompok == 'B' ? 'green' : 'purple') }}-100 text-{{ $s->kelompok == 'A' ? 'blue' : ($s->kelompok == 'B' ? 'green' : 'purple') }}-800 rounded-full text-xs">
-                                                Kel. {{ $s->kelompok }}
-                                            </span>
-                                        </td>
-                                        <td class="px-3 py-2 text-sm text-gray-700">
-                                            @php $existingStatus = optional($existing->get($s->id))->status ?? 'hadir'; @endphp
-                                            <select name="statuses[{{ $s->id }}]" class="border border-gray-300 rounded px-2 py-1 text-sm">
-                                                <option value="hadir" {{ $existingStatus == 'hadir' ? 'selected' : '' }}>✅ Hadir</option>
-                                                <option value="izin" {{ $existingStatus == 'izin' ? 'selected' : '' }}>📝 Izin</option>
-                                                <option value="sakit" {{ $existingStatus == 'sakit' ? 'selected' : '' }}>🤒 Sakit</option>
-                                                <option value="tidak_hadir" {{ $existingStatus == 'tidak_hadir' ? 'selected' : '' }}>❌ Alpa</option>
-                                            </select>
-                                        </td>
-                                        <td class="px-3 py-2 text-sm text-gray-700">
-                                            <input type="text" name="keterangan[{{ $s->id }}]" value="{{ optional($existing->get($s->id))->keterangan ?? '' }}" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="Opsional">
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                        <div class="mt-4 pt-3 border-t border-gray-200 flex justify-between items-center text-xs text-gray-500">
-                            <span>
-                                <i class="fas fa-info-circle mr-1"></i>
-                                @if(isset($guru) && $guru)
-                                    Dicatat oleh: <strong>{{ $guru->nama }}</strong>
-                                @else
-                                    <span class="text-yellow-600">⚠️ Guru belum dipilih</span>
-                                @endif
-                            </span>
-                            <span>Total: {{ $siswa->count() }} siswa</span>
-                        </div>
-                    @endif
-                </div>
-            </form>
         </div>
+        
+        <div class="space-y-2">
+            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Pilih Kelompok</label>
+            <div class="relative">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">group</span>
+                <select name="kelompok" 
+                        class="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 text-sm appearance-none transition-all cursor-pointer"
+                        onchange="this.form.submit()">
+                    <option value="">- Pilih Kelompok -</option>
+                    <option value="A" {{ $kelompok == 'A' ? 'selected' : '' }}>Kelompok A</option>
+                    <option value="B" {{ $kelompok == 'B' ? 'selected' : '' }}>Kelompok B</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="flex gap-3">
+            <button type="submit" class="flex-1 bg-primary text-white px-6 py-3 rounded-2xl font-bold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/25">
+                Tampilkan Siswa
+            </button>
+        </div>
+    </form>
+</div>
+
+@if($kelompok && $siswa->isNotEmpty())
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div>
+        <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Input Absensi - Kelompok {{ $kelompok }}</h1>
+        <p class="text-sm text-slate-500 mt-1">Silakan isi kehadiran siswa untuk hari ini.</p>
+    </div>
+    <div class="flex items-center gap-4">
+        <div class="relative">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary">calendar_today</span>
+            <input class="pl-12 pr-4 py-3 bg-white border-none rounded-2xl focus:ring-2 focus:ring-primary/20 text-sm font-bold text-primary shadow-sm transition-all outline-none cursor-pointer text-center" style="width: 170px;" type="text" value="{{ \Carbon\Carbon::parse($tanggal)->format('Y-m-d') }}" readonly disabled />
+        </div>
+        @if(isset($guru) && $guru)
+            <div class="hidden md:flex flex-col text-right">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Wali Kelas</span>
+                <span class="text-xs font-bold text-slate-800">{{ $guru->nama }}</span>
+            </div>
+        @endif
     </div>
 </div>
 
-{{-- MODAL KONFIRMASI KALO GURU BELUM DIPILIH --}}
-@if($kelompok && !isset($guru))
-<div class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-96 bg-yellow-50 border border-yellow-200 rounded-lg shadow-lg p-4 z-50">
-    <div class="flex items-start">
-        <div class="flex-shrink-0">
-            <i class="fas fa-exclamation-triangle text-yellow-600"></i>
-        </div>
-        <div class="ml-3 flex-1">
-            <h3 class="text-sm font-medium text-yellow-800">Guru belum ditentukan</h3>
-            <p class="text-xs text-yellow-700 mt-1">
-                Kelompok {{ $kelompok }} belum memiliki guru. Silakan tambahkan guru di menu Data Guru.
-            </p>
-            <div class="mt-3">
-                <a href="{{ route('admin.guru.create') }}" class="text-xs bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1.5 rounded-lg">
-                    Tambah Guru
-                </a>
-            </div>
+<form method="POST" action="{{ route('admin.absensi.store-batch') }}" class="space-y-8" id="form-absensi">
+    @csrf
+    <input type="hidden" name="tanggal" value="{{ $tanggal }}">
+    <input type="hidden" name="kelompok" value="{{ $kelompok }}">
+    @if(isset($guru) && $guru)
+        <input type="hidden" name="guru_id" value="{{ $guru->id }}">
+    @endif
+
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-20">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse min-w-[800px]">
+                <thead>
+                    <tr class="bg-slate-50/50 border-b border-slate-100">
+                        <th class="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-wider w-16">No</th>
+                        <th class="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-wider w-32">NIS</th>
+                        <th class="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-wider">Nama Lengkap</th>
+                        <th class="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-wider text-center">Status Kehadiran</th>
+                        <th class="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-wider">Keterangan</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    @php
+                        // Color variations for avatars
+                        $colors = [
+                            ['bg' => 'bg-lavender', 'text' => 'text-primary'],
+                            ['bg' => 'bg-purple-100', 'text' => 'text-primary'],
+                            ['bg' => 'bg-amber-100', 'text' => 'text-amber-700'],
+                            ['bg' => 'bg-green-100', 'text' => 'text-green-700'],
+                            ['bg' => 'bg-blue-100', 'text' => 'text-blue-700'],
+                            ['bg' => 'bg-rose-100', 'text' => 'text-rose-700'],
+                        ];
+                    @endphp
+                    @foreach($siswa as $index => $s)
+                    @php 
+                        $existingStatus = optional($existing->get($s->id))->status ?? 'hadir'; 
+                        $keterangan = optional($existing->get($s->id))->keterangan ?? '';
+                        $colorClass = $colors[$index % count($colors)];
+                        
+                        // Get initials
+                        $nameParts = explode(' ', $s->nama_lengkap ?? $s->nama);
+                        $initials = '';
+                        foreach(array_slice($nameParts, 0, 2) as $part) {
+                            if(!empty($part)) $initials .= strtoupper(substr($part, 0, 1));
+                        }
+                        if(empty($initials)) $initials = '?';
+                    @endphp
+                    <tr class="hover:bg-slate-50/50 transition-colors group">
+                        <td class="px-6 py-5 text-sm font-medium text-slate-400">{{ $index + 1 }}</td>
+                        <td class="px-6 py-5 text-sm font-bold text-slate-600">{{ $s->nis ?? '-' }}</td>
+                        <td class="px-6 py-5">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full {{ $colorClass['bg'] }} {{ $colorClass['text'] }} flex items-center justify-center font-bold text-xs">{{ $initials }}</div>
+                                <span class="text-sm font-bold text-slate-800">{{ $s->nama_lengkap ?? $s->nama }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-5">
+                            <div class="flex items-center justify-center">
+                                <select name="statuses[{{ $s->id }}]" class="w-36 px-3 py-2 bg-slate-50 border-none rounded-xl focus:ring-2 focus:ring-primary/20 text-sm font-semibold cursor-pointer transition-all appearance-none text-center">
+                                    <option value="hadir" {{ $existingStatus == 'hadir' ? 'selected' : '' }}>Hadir</option>
+                                    <option value="sakit" {{ $existingStatus == 'sakit' ? 'selected' : '' }}>Sakit</option>
+                                    <option value="izin" {{ $existingStatus == 'izin' ? 'selected' : '' }}>Izin</option>
+                                    <option value="alpa" {{ ($existingStatus == 'alpa' || str_contains($existingStatus, 'tidak_hadir')) ? 'selected' : '' }}>Alpa</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td class="px-6 py-5">
+                            <input class="w-full px-4 py-2 bg-slate-50 border-none rounded-lg focus:ring-2 focus:ring-primary/20 text-xs transition-all" name="keterangan[{{ $s->id }}]" placeholder="Catatan..." type="text" value="{{ $keterangan }}"/>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
+
+    <!-- Fixed Bottom Bar -->
+    <div class="fixed bottom-0 right-0 left-0 lg:left-72 bg-white/80 backdrop-blur-md border-t border-slate-100 p-4 z-[40] shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] transition-all duration-300">
+        <div class="max-w-7xl mx-auto flex items-center justify-end gap-4 px-4">
+            <a href="{{ route('admin.absensi.index') }}" class="px-8 py-3 bg-slate-100 text-slate-600 rounded-2xl font-bold text-sm hover:bg-slate-200 transition-all hidden sm:inline-block">
+                Batal
+            </a>
+            <button type="button" onclick="document.getElementById('form-absensi').submit();" class="px-10 py-3 bg-primary text-white rounded-2xl font-bold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 flex items-center gap-2">
+                <span class="material-symbols-outlined text-lg">save</span>
+                Simpan Absensi
+            </button>
+        </div>
+    </div>
+</form>
+
+@elseif($kelompok)
+<div class="bg-white rounded-3xl p-12 border border-slate-100 text-center shadow-sm">
+    <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+        <span class="material-symbols-outlined text-4xl text-slate-300">person_search</span>
+    </div>
+    <h3 class="text-xl font-bold text-slate-800 mb-2">Tidak Ada Siswa</h3>
+    <p class="text-slate-400 text-sm max-w-sm mx-auto mb-8">Belum ada siswa yang terdaftar di Kelompok {{ $kelompok }} untuk saat ini.</p>
+    <a href="{{ route('admin.siswa-aktif.create') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-bold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/25">
+        <span class="material-symbols-outlined text-lg">person_add</span>
+        Tambah Siswa
+    </a>
+</div>
+@else
+<div class="bg-primary/5 border border-primary/10 rounded-3xl p-12 text-center">
+    <div class="w-20 h-20 bg-primary/20 text-primary rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-primary/10">
+        <span class="material-symbols-outlined text-4xl">touch_app</span>
+    </div>
+    <h3 class="text-xl font-bold text-primary mb-2">Pilih Kelompok</h3>
+    <p class="text-slate-500 text-sm max-w-xs mx-auto">Silakan pilih kelompok belajar di atas untuk memulai pencatatan absensi.</p>
 </div>
 @endif
+
 @endsection
-
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/id.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        flatpickr('#fill-tanggal', { 
-            dateFormat: 'Y-m-d', 
-            locale: 'id',
-            defaultDate: '{{ $tanggal }}'
-        });
-    });
-
-    function loadGuruByKelompok() {
-        const kelompok = document.getElementById('kelompok-select').value;
-        if (kelompok) {
-            // Redirect dengan parameter kelompok dan tanggal yang sama
-            const tanggal = document.getElementById('fill-tanggal').value;
-            window.location.href = '{{ route("admin.absensi.fill") }}?tanggal=' + tanggal + '&kelompok=' + kelompok;
-        }
-    }
-</script>
-@endpush

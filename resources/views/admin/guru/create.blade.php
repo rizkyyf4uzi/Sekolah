@@ -1,321 +1,198 @@
 @extends('layouts.admin')
 
-@section('title', 'Tambah Guru & Staff')
-@section('breadcrumb', 'Tambah Guru')
+@section('title', 'Tambah Data Guru - SchoolAdmin Pro')
 
 @section('content')
-<div class="max-w-5xl mx-auto pb-20">
-    <!-- Header Page -->
-    <div class="mb-10 text-center">
-        <h1 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-3">Registrasi Guru <span class="text-primary">&</span> Staff</h1>
-        <p class="text-sm font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center justify-center gap-2">
-            <span class="w-8 h-[2px] bg-primary rounded-full"></span>
-            Lengkapi data pendidik dan tenaga kependidikan baru
-            <span class="w-8 h-[2px] bg-primary rounded-full"></span>
-        </p>
-    </div>
+<div class="min-h-screen bg-background-light dark:bg-background-dark p-8 pb-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Breadcrumb -->
+        <nav aria-label="Breadcrumb" class="flex mb-6">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <span class="text-slate-400 text-sm font-medium">Master Data</span>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <span class="material-symbols-outlined text-slate-400 text-sm mx-1">chevron_right</span>
+                        <span class="text-slate-400 text-sm font-medium">Data Guru</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <span class="material-symbols-outlined text-slate-400 text-sm mx-1">chevron_right</span>
+                        <span class="text-slate-800 text-sm font-bold">Tambah Data Guru</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
 
-    <form action="{{ route('admin.guru.store') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
-        @csrf
-        
-        <!-- Section A: Identitas Pribadi -->
-        <div class="bg-white dark:bg-slate-800 rounded-[2.5rem] border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden border-b-4 border-b-primary/10">
-            <div class="p-8 border-b border-slate-50 dark:border-slate-700/50 flex items-center gap-4">
-                <div class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-2xl">person_edit</span>
-                </div>
-                <div>
-                    <h2 class="text-xl font-black text-slate-900 dark:text-white tracking-tight leading-none mb-1.5">Identitas Pribadi</h2>
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Informasi dasar dan kependudukan</p>
-                </div>
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900">Tambah Data Guru Baru</h1>
+                <p class="text-sm text-slate-500 mt-1">Silakan lengkapi formulir di bawah ini untuk menambahkan data tenaga pendidik atau staf.</p>
             </div>
-            
-            <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- NIP -->
-                <div class="space-y-2">
-                    <label for="nip" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">NIP (Opsional)</label>
-                    <div class="relative group">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors text-lg">badge</span>
-                        </div>
-                        <input type="text" id="nip" name="nip" 
-                               value="{{ old('nip') }}"
-                               class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border-transparent rounded-2xl focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-sm font-bold text-slate-600 dark:text-slate-300 placeholder:text-slate-300"
-                               placeholder="19800101XXXXXXXXXX">
+            <a href="{{ route('admin.guru.index') }}" class="flex items-center gap-2 text-primary font-bold text-sm hover:underline">
+                <span class="material-symbols-outlined text-lg">arrow_back</span>
+                Kembali ke Daftar
+            </a>
+        </div>
+
+        <form action="{{ route('admin.guru.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+            @csrf
+
+            <!-- Data Pribadi -->
+            <div class="bg-white rounded-2xl p-8 shadow-sm border border-slate-100">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 bg-primary/10 text-primary rounded-xl flex items-center justify-center">
+                        <span class="material-symbols-outlined">person</span>
                     </div>
-                    @error('nip') <p class="text-[10px] font-bold text-rose-500 uppercase tracking-widest animate-pulse ml-1">{{ $message }}</p> @enderror
+                    <h2 class="text-lg font-bold text-slate-800">Data Pribadi</h2>
                 </div>
-                
-                <!-- Nama -->
-                <div class="space-y-2">
-                    <label for="nama" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nama Lengkap *</label>
-                    <div class="relative group">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors text-lg">person</span>
-                        </div>
-                        <input type="text" id="nama" name="nama" required
-                               value="{{ old('nama') }}"
-                               class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border-transparent rounded-2xl focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-sm font-bold text-slate-600 dark:text-slate-300 placeholder:text-slate-300"
-                               placeholder="Contoh: Ahmad Subardjo, S.Pd.">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label for="nama" class="text-sm font-bold text-slate-700">Nama Lengkap *</label>
+                        <input type="text" id="nama" name="nama" required value="{{ old('nama') }}"
+                               class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm transition-all"
+                               placeholder="Masukkan nama lengkap beserta gelar">
+                        @error('nama') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
-                    @error('nama') <p class="text-[10px] font-bold text-rose-500 uppercase tracking-widest animate-pulse ml-1">{{ $message }}</p> @enderror
-                </div>
-                
-                <!-- Tempat Lahir -->
-                <div class="space-y-2">
-                    <label for="tempat_lahir" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tempat Lahir</label>
-                    <div class="relative group">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors text-lg">location_on</span>
-                        </div>
-                        <input type="text" id="tempat_lahir" name="tempat_lahir"
-                               value="{{ old('tempat_lahir') }}"
-                               class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border-transparent rounded-2xl focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-sm font-bold text-slate-600 dark:text-slate-300 placeholder:text-slate-300"
+                    <div class="space-y-2">
+                        <label for="nip" class="text-sm font-bold text-slate-700">NIP</label>
+                        <input type="text" id="nip" name="nip" value="{{ old('nip') }}" maxlength="18"
+                               class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm transition-all"
+                               placeholder="Masukkan Nomor Induk Pegawai">
+                        @error('nip') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div class="space-y-2">
+                        <label for="tempat_lahir" class="text-sm font-bold text-slate-700">Tempat Lahir</label>
+                        <input type="text" id="tempat_lahir" name="tempat_lahir" value="{{ old('tempat_lahir') }}"
+                               class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm transition-all"
                                placeholder="Kota Kelahiran">
                     </div>
-                </div>
-
-                <!-- Tanggal Lahir -->
-                <div class="space-y-2">
-                    <label for="tanggal_lahir" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tanggal Lahir *</label>
-                    <div class="relative group">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors text-lg">calendar_today</span>
-                        </div>
-                        <input type="date" id="tanggal_lahir" name="tanggal_lahir" required
-                               value="{{ old('tanggal_lahir') }}"
-                               class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border-transparent rounded-2xl focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-sm font-bold text-slate-600 dark:text-slate-300 appearance-none">
+                    <div class="space-y-2">
+                        <label for="tanggal_lahir" class="text-sm font-bold text-slate-700">Tanggal Lahir *</label>
+                        <input type="date" id="tanggal_lahir" name="tanggal_lahir" required value="{{ old('tanggal_lahir') }}"
+                               class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm transition-all">
+                        @error('tanggal_lahir') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
-                    @error('tanggal_lahir') <p class="text-[10px] font-bold text-rose-500 uppercase tracking-widest animate-pulse ml-1">{{ $message }}</p> @enderror
-                </div>
-
-                <!-- Jenis Kelamin -->
-                <div class="space-y-4">
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 block">Jenis Kelamin *</label>
-                    <div class="grid grid-cols-2 gap-4">
-                        <label class="relative cursor-pointer group">
-                            <input type="radio" name="jenis_kelamin" value="L" required
-                                   {{ old('jenis_kelamin', 'L') == 'L' ? 'checked' : '' }}
-                                   class="peer hidden">
-                            <div class="flex items-center justify-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 border-2 border-transparent rounded-2xl peer-checked:border-primary peer-checked:bg-primary/5 peer-checked:text-primary transition-all group-hover:bg-slate-100 dark:group-hover:bg-slate-700">
-                                <span class="material-symbols-outlined text-xl">male</span>
-                                <span class="text-[10px] font-black uppercase tracking-widest">Laki-laki</span>
-                            </div>
-                        </label>
-                        <label class="relative cursor-pointer group">
-                            <input type="radio" name="jenis_kelamin" value="P"
-                                   {{ old('jenis_kelamin') == 'P' ? 'checked' : '' }}
-                                   class="peer hidden">
-                            <div class="flex items-center justify-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 border-2 border-transparent rounded-2xl peer-checked:border-pink-500 peer-checked:bg-pink-500/5 peer-checked:text-pink-600 transition-all group-hover:bg-slate-100 dark:group-hover:bg-slate-700">
-                                <span class="material-symbols-outlined text-xl">female</span>
-                                <span class="text-[10px] font-black uppercase tracking-widest">Perempuan</span>
-                            </div>
-                        </label>
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-slate-700 block">Jenis Kelamin *</label>
+                        <div class="flex items-center gap-6 h-[42px]">
+                            <label class="flex items-center gap-2 cursor-pointer group">
+                                <input type="radio" name="jenis_kelamin" value="L" required
+                                       {{ old('jenis_kelamin', 'L') == 'L' ? 'checked' : '' }}
+                                       class="w-4 h-4 text-primary border-slate-300 focus:ring-primary/20">
+                                <span class="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">Laki-laki</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer group">
+                                <input type="radio" name="jenis_kelamin" value="P"
+                                       {{ old('jenis_kelamin') == 'P' ? 'checked' : '' }}
+                                       class="w-4 h-4 text-primary border-slate-300 focus:ring-primary/20">
+                                <span class="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">Perempuan</span>
+                            </label>
+                        </div>
+                        @error('jenis_kelamin') <p class="text-xs text-red-500">{{ $message }}</p> @enderror
+                    </div>
+                    <div class="space-y-2">
+                        <label for="agama" class="text-sm font-bold text-slate-700">Agama</label>
+                        <select id="agama" name="agama"
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm transition-all">
+                            <option value="">Pilih Agama</option>
+                            @foreach(['Islam','Kristen','Katolik','Hindu','Buddha','Khonghucu'] as $agama)
+                                <option value="{{ $agama }}" {{ old('agama') == $agama ? 'selected' : '' }}>{{ $agama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="no_hp" class="text-sm font-bold text-slate-700">No HP *</label>
+                        <input type="tel" id="no_hp" name="no_hp" required value="{{ old('no_hp') }}" maxlength="13"
+                               class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm transition-all"
+                               placeholder="Contoh: 081234567890">
+                        @error('no_hp') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div class="space-y-2">
+                        <label for="email" class="text-sm font-bold text-slate-700">Email *</label>
+                        <input type="email" id="email" name="email" required value="{{ old('email') }}"
+                               class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm transition-all"
+                               placeholder="nama@sekolah.sch.id">
+                        @error('email') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
+            </div>
 
-                <!-- Jenjang Pendidikan -->
-                <div class="space-y-2">
-                    <label for="pendidikan_terakhir" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Pendidikan Terakhir</label>
-                    <div class="relative group">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors text-lg">history_edu</span>
-                        </div>
+            <!-- Data Kepegawaian -->
+            <div class="bg-white rounded-2xl p-8 shadow-sm border border-slate-100">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 bg-primary/10 text-primary rounded-xl flex items-center justify-center">
+                        <span class="material-symbols-outlined">work</span>
+                    </div>
+                    <h2 class="text-lg font-bold text-slate-800">Data Kepegawaian</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label for="jabatan" class="text-sm font-bold text-slate-700">Jabatan *</label>
+                        <select id="jabatan" name="jabatan" required
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm transition-all">
+                            <option value="">Pilih Jabatan</option>
+                            <option value="guru" {{ old('jabatan') == 'guru' ? 'selected' : '' }}>Guru</option>
+                            <option value="staff" {{ old('jabatan') == 'staff' ? 'selected' : '' }}>Staf</option>
+                        </select>
+                        @error('jabatan') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div id="kelompok-container" class="space-y-2 {{ old('jabatan') == 'guru' ? '' : 'hidden' }}">
+                        <label for="kelompok" class="text-sm font-bold text-slate-700">Kelompok</label>
+                        <select id="kelompok" name="kelompok"
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm transition-all">
+                            <option value="">Pilih Kelompok</option>
+                            <option value="A" {{ old('kelompok') == 'A' ? 'selected' : '' }}>Kelompok A</option>
+                            <option value="B" {{ old('kelompok') == 'B' ? 'selected' : '' }}>Kelompok B</option>
+                        </select>
+                        @error('kelompok') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div class="space-y-2">
+                        <label for="pendidikan_terakhir" class="text-sm font-bold text-slate-700">Pendidikan Terakhir</label>
                         <select id="pendidikan_terakhir" name="pendidikan_terakhir"
-                                class="w-full pl-12 pr-10 py-4 bg-slate-50 dark:bg-slate-900 border-transparent rounded-2xl focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-sm font-bold text-slate-600 dark:text-slate-300 appearance-none cursor-pointer">
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm transition-all">
                             <option value="">Pilih Pendidikan</option>
-                            @foreach(['SMA' => 'SMA/Sederajat', 'D1' => 'Diploma 1', 'D2' => 'Diploma 2', 'D3' => 'Diploma 3', 'D4' => 'Diploma 4', 'S1' => 'Sarjana (S1)', 'S2' => 'Magister (S2)', 'S3' => 'Doktor (S3)'] as $val => $label)
+                            @foreach(['SMA' => 'SMA/Sederajat', 'D1' => 'D1', 'D2' => 'D2', 'D3' => 'D3', 'S1' => 'S1', 'S2' => 'S2', 'S3' => 'S3'] as $val => $label)
                                 <option value="{{ $val }}" {{ old('pendidikan_terakhir') == $val ? 'selected' : '' }}>{{ $label }}</option>
                             @endforeach
                         </select>
-                        <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-300">
-                            <span class="material-symbols-outlined text-lg font-bold">expand_more</span>
-                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Section B: Kontak & Jabatan -->
-        <div class="bg-white dark:bg-slate-800 rounded-[2.5rem] border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden border-b-4 border-b-emerald-500/10">
-            <div class="p-8 border-b border-slate-50 dark:border-slate-700/50 flex items-center gap-4">
-                <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-2xl">contact_mail</span>
+            <!-- Alamat -->
+            <div class="bg-white rounded-2xl p-8 shadow-sm border border-slate-100">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 bg-primary/10 text-primary rounded-xl flex items-center justify-center">
+                        <span class="material-symbols-outlined">home</span>
+                    </div>
+                    <h2 class="text-lg font-bold text-slate-800">Alamat</h2>
                 </div>
-                <div>
-                    <h2 class="text-xl font-black text-slate-900 dark:text-white tracking-tight leading-none mb-1.5">Kontak & Karir</h2>
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Informasi komunikasi dan posisi kerja</p>
-                </div>
-            </div>
-            
-            <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- No HP -->
                 <div class="space-y-2">
-                    <label for="no_hp" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">No. HP / WhatsApp *</label>
-                    <div class="relative group">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors text-lg">phone_android</span>
-                        </div>
-                        <input type="tel" id="no_hp" name="no_hp" required
-                               value="{{ old('no_hp') }}"
-                               class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border-transparent rounded-2xl focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-sm font-bold text-slate-600 dark:text-slate-300 placeholder:text-slate-300"
-                               placeholder="08XXXXXXXXXX">
-                    </div>
-                    @error('no_hp') <p class="text-[10px] font-bold text-rose-500 uppercase tracking-widest animate-pulse ml-1">{{ $message }}</p> @enderror
-                </div>
-                
-                <!-- Email -->
-                <div class="space-y-2">
-                    <label for="email" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Alamat Email *</label>
-                    <div class="relative group">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors text-lg">alternate_email</span>
-                        </div>
-                        <input type="email" id="email" name="email" required
-                               value="{{ old('email') }}"
-                               class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border-transparent rounded-2xl focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-sm font-bold text-slate-600 dark:text-slate-300 placeholder:text-slate-300"
-                               placeholder="nama@email.com">
-                    </div>
-                    @error('email') <p class="text-[10px] font-bold text-rose-500 uppercase tracking-widest animate-pulse ml-1">{{ $message }}</p> @enderror
-                </div>
-
-                <!-- Jabatan -->
-                <div class="space-y-2">
-                    <label for="jabatan" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Jabatan Struktural *</label>
-                    <div class="relative group">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors text-lg">work</span>
-                        </div>
-                        <select id="jabatan" name="jabatan" required
-                                class="w-full pl-12 pr-10 py-4 bg-slate-50 dark:bg-slate-900 border-transparent rounded-2xl focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-sm font-bold text-slate-600 dark:text-slate-300 appearance-none cursor-pointer">
-                            <option value="">Pilih Jabatan</option>
-                            <option value="guru" {{ old('jabatan') == 'guru' ? 'selected' : '' }}>Guru Pengajar</option>
-                            <option value="staff" {{ old('jabatan') == 'staff' ? 'selected' : '' }}>Staff Administrasi</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-300">
-                            <span class="material-symbols-outlined text-lg font-bold">expand_more</span>
-                        </div>
-                    </div>
-                    @error('jabatan') <p class="text-[10px] font-bold text-rose-500 uppercase tracking-widest animate-pulse ml-1">{{ $message }}</p> @enderror
-                </div>
-
-                <!-- Kelompok (Dinamis) -->
-                <div id="kelompok-container" class="space-y-2 hidden">
-                    <label for="kelompok" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Wali Kelompok *</label>
-                    <div class="relative group">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors text-lg">groups</span>
-                        </div>
-                        <select id="kelompok" name="kelompok"
-                                class="w-full pl-12 pr-10 py-4 bg-slate-50 dark:bg-slate-900 border-transparent rounded-2xl focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-sm font-bold text-slate-600 dark:text-slate-300 appearance-none cursor-pointer">
-                            <option value="">Pilih Kelompok</option>
-                            <option value="A" {{ old('kelompok') == 'A' ? 'selected' : '' }}>Kelompok A (Usia 4-5 th)</option>
-                            <option value="B" {{ old('kelompok') == 'B' ? 'selected' : '' }}>Kelompok B (Usia 5-6 th)</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-300">
-                            <span class="material-symbols-outlined text-lg font-bold">expand_more</span>
-                        </div>
-                    </div>
-                    @error('kelompok') <p class="text-[10px] font-bold text-rose-500 uppercase tracking-widest animate-pulse ml-1">{{ $message }}</p> @enderror
-                </div>
-
-                <!-- Alamat (Full Width) -->
-                <div class="space-y-2 md:col-span-2">
-                    <label for="alamat" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 text-primary">Alamat Tempat Tinggal Saat Ini *</label>
-                    <div class="relative group">
-                        <div class="absolute top-4 left-4 pointer-events-none">
-                            <span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors text-lg">home</span>
-                        </div>
-                        <textarea id="alamat" name="alamat" rows="3" required
-                                  class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border-transparent rounded-[1.5rem] focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-sm font-bold text-slate-600 dark:text-slate-300 placeholder:text-slate-300 resize-none"
-                                  placeholder="Tuliskan alamat lengkap sesuai KTP atau domisili...">{{ old('alamat') }}</textarea>
-                    </div>
+                    <label for="alamat" class="text-sm font-bold text-slate-700">Alamat Lengkap *</label>
+                    <textarea id="alamat" name="alamat" rows="4" required
+                              class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm transition-all resize-none"
+                              placeholder="Masukkan alamat lengkap rumah tinggal saat ini">{{ old('alamat') }}</textarea>
+                    @error('alamat') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>
-        </div>
 
-        <!-- Section C: Foto Media -->
-        <div class="bg-white dark:bg-slate-800 rounded-[2.5rem] border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden border-b-4 border-b-amber-500/10">
-            <div class="p-8 border-b border-slate-50 dark:border-slate-700/50 flex items-center gap-4">
-                <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-2xl">photo_camera</span>
-                </div>
-                <div>
-                    <h2 class="text-xl font-black text-slate-900 dark:text-white tracking-tight leading-none mb-1.5">Foto Profil</h2>
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Format formal untuk kartu identitas</p>
-                </div>
+            <!-- Actions -->
+            <div class="flex items-center justify-end gap-4 py-4">
+                <a href="{{ route('admin.guru.index') }}"
+                   class="px-8 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all">
+                    Batal
+                </a>
+                <button type="submit"
+                        class="px-10 py-3 bg-primary text-white rounded-xl font-bold text-sm hover:opacity-90 transition-all shadow-lg shadow-primary/20 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-lg">save</span>
+                    Simpan Data
+                </button>
             </div>
-            
-            <div class="p-8">
-                <div class="flex flex-col md:flex-row gap-8 items-start">
-                    <div class="w-full md:w-1/3">
-                        <label class="group relative flex flex-col items-center justify-center w-full aspect-square bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-[2rem] hover:bg-slate-100/50 dark:hover:bg-slate-800/50 hover:border-primary/50 transition-all cursor-pointer overflow-hidden">
-                            <input type="file" id="foto" name="foto" accept="image/*" class="hidden">
-                            
-                            <div id="upload-placeholder" class="flex flex-col items-center text-center p-6 transition-all">
-                                <div class="w-16 h-16 rounded-2xl bg-white dark:bg-slate-800 flex items-center justify-center shadow-sm text-slate-400 group-hover:text-primary transition-colors mb-4">
-                                    <span class="material-symbols-outlined text-3xl">add_a_photo</span>
-                                </div>
-                                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 group-hover:text-slate-600 transition-colors">Pilih Berkas</span>
-                                <span class="text-[8px] font-bold text-slate-300 uppercase tracking-widest mt-2">JPG, PNG, JPEG (MAX 2MB)</span>
-                            </div>
-
-                            <img id="preview-image" class="absolute inset-0 w-full h-full object-cover hidden transition-all duration-300">
-                            
-                            <div id="change-overlay" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm items-center justify-center hidden group-hover:flex transition-all">
-                                <span class="text-white text-[10px] font-black uppercase tracking-widest">Ganti Foto</span>
-                            </div>
-                        </label>
-                        @error('foto') <p class="text-[10px] font-bold text-rose-500 uppercase tracking-widest animate-pulse mt-3 text-center">{{ $message }}</p> @enderror
-                    </div>
-
-                    <div class="flex-1 space-y-4">
-                        <div class="p-6 rounded-3xl bg-amber-50/50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/20">
-                            <h4 class="text-xs font-black text-amber-700 dark:text-amber-500 uppercase tracking-widest mb-2 flex items-center gap-2">
-                                <span class="material-symbols-outlined text-lg font-bold">lightbulb</span>
-                                Tips Foto Formal
-                            </h4>
-                            <ul class="text-[10px] font-bold text-slate-500 dark:text-slate-400 space-y-2 uppercase tracking-widest">
-                                <li class="flex items-start gap-2">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1 flex-shrink-0"></span>
-                                    Latar belakang polos berwarna (Biru/Merah)
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1 flex-shrink-0"></span>
-                                    Pakaian formal (Seragam/Batik)
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1 flex-shrink-0"></span>
-                                    Sudut pandang lurus dengan wajah yang jelas
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Form Actions -->
-        <div class="flex flex-col sm:flex-row items-center justify-end gap-4 p-4">
-            <a href="{{ route('admin.guru.index') }}" 
-               class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-black text-xs uppercase tracking-widest border border-slate-200 dark:border-slate-600 shadow-sm hover:bg-slate-50 transition-all text-center">
-                Batal
-            </a>
-            <button type="submit" 
-                    id="submit-btn"
-                    class="w-full sm:w-auto px-10 py-4 rounded-2xl bg-primary text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-105 transition-all active:scale-95 flex items-center justify-center gap-3">
-                <span class="material-symbols-outlined text-lg">save</span>
-                Simpan Data Guru
-            </button>
-        </div>
-    </form>
-</div>
-
-<!-- Loading Overlay -->
-<div id="loading-spinner" class="fixed inset-0 bg-slate-900/20 backdrop-blur-[2px] z-[60] flex items-center justify-center hidden opacity-0 transition-all duration-300">
-    <div class="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] shadow-2xl flex flex-col items-center gap-4">
-        <div class="w-16 h-16 border-4 border-primary/10 border-t-primary rounded-full animate-spin"></div>
-        <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Mengunggah Data...</span>
+        </form>
     </div>
 </div>
 @endsection
@@ -323,33 +200,33 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Foto Preview Logic
-    const fotoInput = document.getElementById('foto');
-    const previewImg = document.getElementById('preview-image');
-    const placeholder = document.getElementById('upload-placeholder');
-    const overlay = document.getElementById('change-overlay');
-    
-    if (fotoInput) {
-        fotoInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewImg.src = e.target.result;
-                    previewImg.classList.remove('hidden');
-                    placeholder.classList.add('hidden');
-                    overlay.classList.remove('hidden');
-                }
-                reader.readAsDataURL(file);
+    // NIP hanya angka dan max 18 karakter
+    const nipInput = document.getElementById('nip');
+    if (nipInput) {
+        nipInput.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length > 18) {
+                this.value = this.value.slice(0, 18);
             }
         });
     }
-    
-    // Kelompok Visibility Logic
+
+    // No HP hanya angka dan max 13 karakter
+    const noHpInput = document.getElementById('no_hp');
+    if (noHpInput) {
+        noHpInput.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length > 13) {
+                this.value = this.value.slice(0, 13);
+            }
+        });
+    }
+
+    // Kelompok toggle
     const jabatanSelect = document.getElementById('jabatan');
     const kelompokContainer = document.getElementById('kelompok-container');
     const kelompokSelect = document.getElementById('kelompok');
-    
+
     function toggleKelompok() {
         if (jabatanSelect.value === 'guru') {
             kelompokContainer.classList.remove('hidden');
@@ -360,29 +237,19 @@ document.addEventListener('DOMContentLoaded', function() {
             kelompokSelect.value = '';
         }
     }
-    
-    jabatanSelect.addEventListener('change', toggleKelompok);
-    toggleKelompok(); // Initial check
+
+    if (jabatanSelect) {
+        jabatanSelect.addEventListener('change', toggleKelompok);
+        toggleKelompok();
+    }
 
     // Date constraints
     const tanggalLahir = document.getElementById('tanggal_lahir');
     if (tanggalLahir) {
         const today = new Date();
-        const minDate = new Date(today.getFullYear() - 65, today.getMonth(), today.getDate());
-        const maxDate = new Date(today.getFullYear() - 17, today.getMonth(), today.getDate());
-        tanggalLahir.max = maxDate.toISOString().split('T')[0];
-        tanggalLahir.min = minDate.toISOString().split('T')[0];
+        tanggalLahir.max = new Date(today.getFullYear() - 17, today.getMonth(), today.getDate()).toISOString().split('T')[0];
+        tanggalLahir.min = new Date(today.getFullYear() - 65, today.getMonth(), today.getDate()).toISOString().split('T')[0];
     }
-
-    // Loader logic
-    const form = document.querySelector('form');
-    const spinner = document.getElementById('loading-spinner');
-    
-    form.addEventListener('submit', function() {
-        spinner.classList.remove('hidden');
-        setTimeout(() => spinner.classList.add('opacity-100'), 10);
-        document.getElementById('submit-btn').disabled = true;
-    });
 });
 </script>
 @endpush
