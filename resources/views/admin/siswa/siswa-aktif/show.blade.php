@@ -1,839 +1,726 @@
-{{-- resources/views/admin/siswa/show.blade.php --}}
+{{-- resources/views/admin/siswa/siswa-aktif/show.blade.php --}}
 @extends('layouts.admin')
 
 @section('title', 'Detail Siswa')
 
 @section('content')
-<div class="p-4 sm:p-6 bg-gray-50 min-h-screen">
-    <!-- Header -->
-    <div class="mb-6 sm:mb-8">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-                <div class="flex items-center gap-4 mb-4">
+<div class="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 sm:p-6">
+    <div class="max-w-7xl mx-auto">
+        <!-- Breadcrumb -->
+        <nav aria-label="Breadcrumb" class="flex mb-6 text-xs font-bold text-slate-400 uppercase tracking-widest">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li><a href="#" class="hover:text-primary transition-colors">Master Data</a></li>
+                <li><span class="mx-2 text-slate-300">/</span></li>
+                <li><a href="{{ route('admin.siswa.siswa-aktif.index') }}" class="hover:text-primary transition-colors">Data Siswa</a></li>
+                <li><span class="mx-2 text-slate-300">/</span></li>
+                <li class="text-slate-600 dark:text-slate-300">Detail Siswa</li>
+            </ol>
+        </nav>
+
+        <!-- Header -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
+            <div class="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-5">
+                <div class="relative group">
                     @if($siswa->foto && Storage::disk('public')->exists($siswa->foto))
                         <img src="{{ asset('storage/' . $siswa->foto) }}" 
                              alt="{{ $siswa->nama_lengkap }}" 
-                             class="h-16 w-16 sm:h-20 sm:w-20 rounded-full object-cover border-2 border-gray-200">
+                             class="h-24 w-24 sm:h-28 sm:w-28 rounded-3xl object-cover ring-4 ring-white dark:ring-slate-800 shadow-2xl transition-transform group-hover:scale-105 duration-500">
                     @else
-                        <div class="h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center border-2 border-gray-200">
-                            <i class="fas fa-user-graduate text-blue-400 text-xl sm:text-2xl"></i>
+                        <div class="h-24 w-24 sm:h-28 sm:w-28 rounded-3xl bg-primary/10 text-primary flex items-center justify-center ring-4 ring-white dark:ring-slate-800 shadow-xl border border-primary/20">
+                            <span class="material-symbols-outlined text-4xl sm:text-5xl">person</span>
                         </div>
                     @endif
-                    <div>
-                        <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">
-                            {{ $siswa->nama_lengkap }}
-                        </h1>
-                        <div class="flex flex-wrap items-center gap-2 sm:gap-4 mt-1">
-                            <span class="text-xs sm:text-sm text-gray-500">NIS:</span>
-                            <span class="font-mono bg-gray-100 px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm">
-                                {{ $siswa->nis ?? 'NIS-' . str_pad($siswa->id, 5, '0', STR_PAD_LEFT) }}
-                            </span>
-                            @if($siswa->nisn)
-                            <span class="text-xs sm:text-sm text-gray-500 ml-2">NISN:</span>
-                            <span class="font-mono bg-gray-100 px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm">
-                                {{ $siswa->nisn }}
-                            </span>
-                            @endif
-                        </div>
+                    <div class="absolute -bottom-2 -right-2 h-9 w-9 rounded-full bg-white dark:bg-slate-800 shadow-lg flex items-center justify-center border border-slate-100 dark:border-slate-700">
+                        <span class="material-symbols-outlined text-primary text-lg font-bold">verified</span>
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <h1 class="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+                        {{ $siswa->nama_lengkap }}
+                    </h1>
+                    <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-2">
+                        <span class="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] font-black tracking-widest uppercase border border-slate-100 dark:border-slate-700 shadow-sm">
+                            NIS: {{ $siswa->nis ?? '-' }}
+                        </span>
+                        @if($siswa->nisn)
+                        <span class="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] font-black tracking-widest uppercase border border-slate-100 dark:border-slate-700 shadow-sm">
+                            NISN: {{ $siswa->nisn }}
+                        </span>
+                        @endif
                     </div>
                 </div>
             </div>
-            <div class="flex flex-wrap gap-2 sm:gap-3">
-                <a href="{{ route('admin.siswa.siswa-aktif.index') }}" 
-                   class="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition text-sm sm:text-base">
-                    <i class="fas fa-arrow-left text-xs sm:text-sm"></i> 
-                    <span class="hidden sm:inline">Kembali</span>
-                    <span class="sm:hidden">Back</span>
-                </a>
-                
-                @if($siswa->spmb_id)
-                <a href="{{ route('admin.spmb.show', $siswa->spmb_id) }}" 
-                   class="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition text-sm sm:text-base">
-                    <i class="fas fa-exchange-alt text-xs sm:text-sm"></i>
-                    <span class="hidden sm:inline">Lihat Data SPMB</span>
-                    <span class="sm:hidden">SPMB</span>
-                </a>
-                @endif
-                
-                <a href="{{ route('admin.siswa.siswa-aktif.edit', $siswa) }}" 
-                   class="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition text-sm sm:text-base">
-                    <i class="fas fa-edit text-xs sm:text-sm"></i>
-                    <span class="hidden sm:inline">Edit</span>
-                    <span class="sm:hidden">Edit</span>
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Status Banner -->
-    <div class="mb-6 sm:mb-8">
-        @php
-            $statusColors = [
-                'aktif' => 'bg-green-100 border-green-300 text-green-800',
-                'lulus' => 'bg-blue-100 border-blue-300 text-blue-800',
-                'pindah' => 'bg-yellow-100 border-yellow-300 text-yellow-800',
-                'cuti' => 'bg-purple-100 border-purple-300 text-purple-800',
-            ];
             
-            $statusIcons = [
-                'aktif' => 'fa-check-circle',
-                'lulus' => 'fa-graduation-cap',
-                'pindah' => 'fa-exchange-alt',
-                'cuti' => 'fa-clock',
-            ];
-        @endphp
-        
-        <div class="p-4 border rounded-xl {{ $statusColors[$siswa->status_siswa] ?? 'bg-gray-100 border-gray-300' }}">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <i class="fas {{ $statusIcons[$siswa->status_siswa] ?? 'fa-info-circle' }} text-xl"></i>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <a href="{{ route('admin.siswa.siswa-aktif.index') }}" 
+                   class="flex items-center justify-center gap-2 px-6 py-4 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all font-bold text-sm shadow-sm group">
+                    <span class="material-symbols-outlined text-xl group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                    Kembali
+                </a>
+                <a href="{{ route('admin.siswa.siswa-aktif.edit', $siswa) }}" 
+                   class="flex items-center justify-center gap-2 px-6 py-4 bg-primary text-white rounded-2xl hover:bg-primary-dark transition-all font-bold text-sm shadow-xl shadow-primary/20">
+                    <span class="material-symbols-outlined text-xl">edit</span>
+                    Edit Data
+                </a>
+            </div>
+        </div>
+
+        <!-- Status Banner -->
+        <div class="mb-10">
+            @php
+                $statusConfig = [
+                    'aktif' => ['color' => 'bg-emerald-50 text-emerald-700 border-emerald-100', 'icon' => 'check_circle', 'label' => 'Siswa Aktif'],
+                    'lulus' => ['color' => 'bg-indigo-50 text-indigo-700 border-indigo-100', 'icon' => 'school', 'label' => 'Sudah Lulus'],
+                    'pindah' => ['color' => 'bg-amber-50 text-amber-700 border-amber-100', 'icon' => 'swap_horiz', 'label' => 'Pindah Sekolah'],
+                    'cuti' => ['color' => 'bg-slate-100 text-slate-700 border-slate-200', 'icon' => 'pause_circle', 'label' => 'Cuti / Non-Aktif'],
+                ];
+                $config = $statusConfig[$siswa->status_siswa] ?? $statusConfig['aktif'];
+            @endphp
+            
+            <div class="p-6 sm:p-8 rounded-[2rem] border-2 {{ $config['color'] }} flex flex-col lg:flex-row lg:items-center justify-between gap-8 shadow-sm bg-white/50 backdrop-blur-sm">
+                <div class="flex items-center gap-4 sm:gap-5">
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white flex items-center justify-center shadow-sm text-primary flex-shrink-0">
+                        <span class="material-symbols-outlined text-3xl sm:text-4xl">{{ $config['icon'] }}</span>
+                    </div>
                     <div>
-                        <h3 class="font-bold text-lg">Status Siswa: 
-                            <span class="uppercase">{{ $siswa->status_siswa }}</span>
-                        </h3>
-                        <p class="text-sm mt-1 text-gray-600">
-                            <i class="far fa-calendar-alt mr-2"></i>
-                            Tanggal Masuk: {{ $siswa->tanggal_masuk->translatedFormat('d F Y') }}
-                        </p>
+                        <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] opacity-60 mb-0.5 sm:mb-1">Status Akademik</p>
+                        <h3 class="font-black text-xl sm:text-2xl tracking-tight leading-tight">{{ $config['label'] }}</h3>
                     </div>
                 </div>
                 
-                @if($siswa->spmb_id)
-                <div class="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">
-                    <i class="fas fa-user-check mr-2"></i> Dari SPMB
-                </div>
-                @endif
-            </div>
-        </div>
-    </div>
-
-    <!-- Navigation Tabs -->
-    <div class="mb-6 border-b border-gray-200 overflow-x-auto">
-        <ul class="flex flex-nowrap sm:flex-wrap -mb-px text-sm font-medium text-center" id="tabMenu" role="tablist">
-            <li class="mr-2 flex-shrink-0" role="presentation">
-                <button class="inline-block p-3 sm:p-4 border-b-2 rounded-t-lg active-tab" id="profile-tab" type="button" role="tab" onclick="showTab('profile')">Data Pribadi</button>
-            </li>
-            <li class="mr-2 flex-shrink-0" role="presentation">
-                <button class="inline-block p-3 sm:p-4 border-b-2 border-transparent rounded-t-lg hover:border-gray-300" id="address-tab" type="button" role="tab" onclick="showTab('address')">Alamat & Kesehatan</button>
-            </li>
-            <li class="mr-2 flex-shrink-0" role="presentation">
-                <button class="inline-block p-3 sm:p-4 border-b-2 border-transparent rounded-t-lg hover:border-gray-300" id="father-tab" type="button" role="tab" onclick="showTab('father')">Data Ayah</button>
-            </li>
-            <li class="mr-2 flex-shrink-0" role="presentation">
-                <button class="inline-block p-3 sm:p-4 border-b-2 border-transparent rounded-t-lg hover:border-gray-300" id="mother-tab" type="button" role="tab" onclick="showTab('mother')">Data Ibu</button>
-            </li>
-            <li class="mr-2 flex-shrink-0" role="presentation">
-                <button class="inline-block p-3 sm:p-4 border-b-2 border-transparent rounded-t-lg hover:border-gray-300" id="guardian-tab" type="button" role="tab" onclick="showTab('guardian')">Data Wali</button>
-            </li>
-            <li class="flex-shrink-0" role="presentation">
-                <button class="inline-block p-3 sm:p-4 border-b-2 border-transparent rounded-t-lg hover:border-gray-300" id="academic-tab" type="button" role="tab" onclick="showTab('academic')">Akademik</button>
-            </li>
-        </ul>
-    </div>
-
-    <!-- Tab: Data Pribadi -->
-    <div id="profile" class="tab-content">
-        <div class="bg-white rounded-xl shadow-md overflow-hidden">
-            <div class="px-4 sm:px-6 py-3 sm:py-4 bg-blue-50 border-b border-blue-100">
-                <h3 class="text-base sm:text-lg font-medium text-gray-900 flex items-center">
-                    <i class="fas fa-child mr-3 text-blue-600"></i>
-                    Data Pribadi
-                </h3>
-            </div>
-            <div class="p-4 sm:p-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">NIK</label>
-                        <p class="text-sm sm:text-base font-mono">{{ $siswa->nik }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">NIS</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->nis ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">NISN</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->nisn ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Nama Lengkap</label>
-                        <p class="text-sm sm:text-base font-medium">{{ $siswa->nama_lengkap }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Nama Panggilan</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->nama_panggilan ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Tempat Lahir</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->tempat_lahir }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Tanggal Lahir</label>
-                        <p class="text-sm sm:text-base">
-                            {{ $siswa->tanggal_lahir->translatedFormat('d F Y') }}
-                            <span class="text-gray-500 ml-2 text-xs sm:text-sm">
-                                ({{ $siswa->usia_label }})
-                            </span>
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Jenis Kelamin</label>
-                        <p class="mt-1">
-                            @if($siswa->jenis_kelamin == 'L')
-                            <span class="inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                <i class="fas fa-mars mr-1"></i> Laki-laki
-                            </span>
-                            @else
-                            <span class="inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-medium bg-pink-100 text-pink-800">
-                                <i class="fas fa-venus mr-1"></i> Perempuan
-                            </span>
-                            @endif
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Agama</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->agama ?? '-' }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tab: Alamat & Kesehatan -->
-    <div id="address" class="tab-content hidden">
-        <div class="bg-white rounded-xl shadow-md overflow-hidden">
-            <div class="px-4 sm:px-6 py-3 sm:py-4 bg-indigo-50 border-b border-indigo-100">
-                <h3 class="text-base sm:text-lg font-medium text-gray-900 flex items-center">
-                    <i class="fas fa-map-marker-alt mr-3 text-indigo-600"></i>
-                    Alamat & Kesehatan
-                </h3>
-            </div>
-            <div class="p-4 sm:p-6">
-                <h4 class="text-sm font-medium text-gray-700 mb-3">Alamat Lengkap</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Provinsi</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->provinsi ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Kota/Kabupaten</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->kota_kabupaten ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Kecamatan</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->kecamatan ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Kelurahan/Desa</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->kelurahan ?? '-' }}</p>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Nama Jalan</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->nama_jalan ?? '-' }}</p>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Alamat Lengkap</label>
-                        <p class="text-sm sm:text-base whitespace-pre-line">{{ $siswa->alamat }}</p>
-                    </div>
-                </div>
-
-                <h4 class="text-sm font-medium text-gray-700 mb-3 pt-4 border-t border-gray-200">Data Kesehatan</h4>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Berat Badan</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->berat_badan ? $siswa->berat_badan . ' kg' : '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Tinggi Badan</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->tinggi_badan ? $siswa->tinggi_badan . ' cm' : '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Golongan Darah</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->golongan_darah ?? '-' }}</p>
-                    </div>
-                </div>
-                
-                @if($siswa->penyakit_pernah_diderita)
-                <div class="mt-4">
-                    <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Penyakit Pernah Diderita</label>
-                    <p class="text-sm sm:text-base">{{ $siswa->penyakit_pernah_diderita }}</p>
-                </div>
-                @endif
-                
-                @if($siswa->imunisasi)
-                <div class="mt-4">
-                    <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Imunisasi</label>
-                    <p class="text-sm sm:text-base">{{ $siswa->imunisasi }}</p>
-                </div>
-                @endif
-            </div>
-        </div>
-    </div>
-
-    <!-- Tab: Data Ayah -->
-    <div id="father" class="tab-content hidden">
-        <div class="bg-white rounded-xl shadow-md overflow-hidden">
-            <div class="px-4 sm:px-6 py-3 sm:py-4 bg-blue-50 border-b border-blue-100">
-                <h3 class="text-base sm:text-lg font-medium text-gray-900 flex items-center">
-                    <i class="fas fa-male mr-3 text-blue-600"></i>
-                    Data Ayah
-                </h3>
-            </div>
-            <div class="p-4 sm:p-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Nama Lengkap</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->nama_ayah }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">NIK</label>
-                        <p class="text-sm sm:text-base font-mono">{{ $siswa->nik_ayah ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Tempat Lahir</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->tempat_lahir_ayah ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Tanggal Lahir</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->tanggal_lahir_ayah ? $siswa->tanggal_lahir_ayah->translatedFormat('d F Y') : '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Pendidikan</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->pendidikan_ayah ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Pekerjaan</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->pekerjaan_ayah ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Bidang Pekerjaan</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->bidang_pekerjaan_ayah ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Penghasilan</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->penghasilan_ayah ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">No. HP/WA</label>
-                        <p class="text-sm sm:text-base">
-                            @if($siswa->no_hp_ayah)
-                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $siswa->no_hp_ayah) }}" 
-                               target="_blank"
-                               class="text-green-600 hover:text-green-800 inline-flex items-center">
-                                <i class="fab fa-whatsapp mr-2"></i>
-                                {{ $siswa->no_hp_ayah }}
-                            </a>
-                            @else
-                            -
-                            @endif
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Email</label>
-                        <p class="text-sm sm:text-base">
-                            @if($siswa->email_ayah)
-                            <a href="mailto:{{ $siswa->email_ayah }}" class="text-blue-600 hover:text-blue-800">
-                                {{ $siswa->email_ayah }}
-                            </a>
-                            @else
-                            -
-                            @endif
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tab: Data Ibu -->
-    <div id="mother" class="tab-content hidden">
-        <div class="bg-white rounded-xl shadow-md overflow-hidden">
-            <div class="px-4 sm:px-6 py-3 sm:py-4 bg-pink-50 border-b border-pink-100">
-                <h3 class="text-base sm:text-lg font-medium text-gray-900 flex items-center">
-                    <i class="fas fa-female mr-3 text-pink-600"></i>
-                    Data Ibu
-                </h3>
-            </div>
-            <div class="p-4 sm:p-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Nama Lengkap</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->nama_ibu }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">NIK</label>
-                        <p class="text-sm sm:text-base font-mono">{{ $siswa->nik_ibu ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Tempat Lahir</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->tempat_lahir_ibu ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Tanggal Lahir</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->tanggal_lahir_ibu ? $siswa->tanggal_lahir_ibu->translatedFormat('d F Y') : '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Pendidikan</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->pendidikan_ibu ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Pekerjaan</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->pekerjaan_ibu ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Bidang Pekerjaan</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->bidang_pekerjaan_ibu ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Penghasilan</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->penghasilan_ibu ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">No. HP/WA</label>
-                        <p class="text-sm sm:text-base">
-                            @if($siswa->no_hp_ibu)
-                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $siswa->no_hp_ibu) }}" 
-                               target="_blank"
-                               class="text-green-600 hover:text-green-800 inline-flex items-center">
-                                <i class="fab fa-whatsapp mr-2"></i>
-                                {{ $siswa->no_hp_ibu }}
-                            </a>
-                            @else
-                            -
-                            @endif
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Email</label>
-                        <p class="text-sm sm:text-base">
-                            @if($siswa->email_ibu)
-                            <a href="mailto:{{ $siswa->email_ibu }}" class="text-blue-600 hover:text-blue-800">
-                                {{ $siswa->email_ibu }}
-                            </a>
-                            @else
-                            -
-                            @endif
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tab: Data Wali -->
-    <div id="guardian" class="tab-content hidden">
-        <div class="bg-white rounded-xl shadow-md overflow-hidden">
-            <div class="px-4 sm:px-6 py-3 sm:py-4 bg-purple-50 border-b border-purple-100">
-                <h3 class="text-base sm:text-lg font-medium text-gray-900 flex items-center">
-                    <i class="fas fa-user-shield mr-3 text-purple-600"></i>
-                    Data Wali
-                </h3>
-            </div>
-            <div class="p-4 sm:p-6">
-                @if($siswa->punya_wali && $siswa->nama_wali)
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Nama Lengkap Wali</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->nama_wali }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Hubungan dengan Anak</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->hubungan_wali ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">NIK Wali</label>
-                        <p class="text-sm sm:text-base font-mono">{{ $siswa->nik_wali ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Pekerjaan Wali</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->pekerjaan_wali ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">No. Telepon Wali</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->nomor_telepon_wali ?? '-' }}</p>
-                    </div>
-                </div>
-                @else
-                <div class="text-center py-8">
-                    <i class="fas fa-user-slash text-gray-300 text-4xl mb-3"></i>
-                    <p class="text-gray-500">Tidak ada data wali</p>
-                </div>
-                @endif
-            </div>
-        </div>
-    </div>
-
-    <!-- Tab: Akademik -->
-    <div id="academic" class="tab-content hidden">
-        <div class="bg-white rounded-xl shadow-md overflow-hidden">
-            <div class="px-4 sm:px-6 py-3 sm:py-4 bg-green-50 border-b border-green-100">
-                <h3 class="text-base sm:text-lg font-medium text-gray-900 flex items-center">
-                    <i class="fas fa-graduation-cap mr-3 text-green-600"></i>
-                    Informasi Akademik
-                </h3>
-            </div>
-            <div class="p-4 sm:p-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Kelompok</label>
-                        <p class="text-sm sm:text-base">
-                            <span class="inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                Kelompok {{ $siswa->kelompok }}
-                            </span>
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Tahun Ajaran</label>
-                        <p class="text-sm sm:text-base">
-                            <span class="inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                {{ $siswa->tahunAjaran->tahun_ajaran ?? $siswa->tahun_ajaran }}
-                            </span>
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Status</label>
-                        <p class="text-sm sm:text-base">
-                            <span class="inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-medium {{ $statusColors[$siswa->status_siswa] }}">
-                                {{ ucfirst($siswa->status_siswa) }}
-                            </span>
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Tanggal Masuk</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->tanggal_masuk->translatedFormat('d F Y') }}</p>
-                    </div>
-                    
-                    @if($siswa->tanggal_keluar)
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Tanggal Keluar</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->tanggal_keluar->translatedFormat('d F Y') }}</p>
-                    </div>
-                    @endif
-                    
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Jalur Masuk</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->jalur_masuk ? ucfirst($siswa->jalur_masuk) : '-' }}</p>
-                    </div>
-                    
-                    @if($siswa->kelas)
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Kelas</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->kelas }}</p>
-                    </div>
-                    @endif
-                    
-                    @if($siswa->guru_kelas)
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Guru Kelas</label>
-                        <p class="text-sm sm:text-base">{{ $siswa->guru_kelas }}</p>
-                    </div>
-                    @endif
-                    
-                    @if($siswa->catatan)
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Catatan</label>
-                        <div class="mt-2 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                            <p class="text-sm text-gray-700 whitespace-pre-line">{{ $siswa->catatan }}</p>
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-6 sm:gap-10">
+                    <div class="flex items-center gap-4">
+                        <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-white flex items-center justify-center text-primary shadow-sm flex-shrink-0">
+                            <span class="material-symbols-outlined text-xl sm:text-2xl">calendar_today</span>
+                        </div>
+                        <div>
+                            <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.15em] opacity-60 mb-0.5">Terdaftar Sejak</p>
+                            <p class="text-sm sm:text-base font-black">{{ $siswa->tanggal_masuk->translatedFormat('d F Y') }}</p>
                         </div>
                     </div>
+                    <div class="flex items-center gap-4 pt-6 sm:pt-0 border-t sm:border-t-0 sm:border-l border-white/50 sm:pl-10">
+                        <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-white flex items-center justify-center text-primary shadow-sm flex-shrink-0">
+                            <span class="material-symbols-outlined text-xl sm:text-2xl">group</span>
+                        </div>
+                        <div>
+                            <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.15em] opacity-60 mb-0.5">Kelompok</p>
+                            <p class="text-sm sm:text-base font-black">Kelompok {{ $siswa->kelompok }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="mb-8 overflow-x-auto no-scrollbar scroll-smooth">
+            <div class="flex p-2 bg-slate-200/50 dark:bg-slate-800/50 backdrop-blur-md rounded-[1.5rem] w-fit min-w-full md:min-w-0">
+                <button onclick="showTab('profile')" id="profile-tab" class="tab-btn px-8 py-3.5 rounded-2xl text-sm font-black transition-all flex items-center gap-3 whitespace-nowrap active bg-white dark:bg-slate-700 shadow-sm text-primary">
+                    <span class="material-symbols-outlined text-xl">person</span> Data Pribadi
+                </button>
+                <button onclick="showTab('address')" id="address-tab" class="tab-btn px-8 py-3.5 rounded-2xl text-sm font-black text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-all flex items-center gap-3 whitespace-nowrap">
+                    <span class="material-symbols-outlined text-xl">location_on</span> Alamat & Kesehatan
+                </button>
+                <button onclick="showTab('family')" id="family-tab" class="tab-btn px-8 py-3.5 rounded-2xl text-sm font-black text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-all flex items-center gap-3 whitespace-nowrap">
+                    <span class="material-symbols-outlined text-xl">family_history</span> Data Orang Tua
+                </button>
+                <button onclick="showTab('guardian')" id="guardian-tab" class="tab-btn px-8 py-3.5 rounded-2xl text-sm font-black text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-all flex items-center gap-3 whitespace-nowrap">
+                    <span class="material-symbols-outlined text-xl">guardian</span> Data Wali
+                </button>
+                <button onclick="showTab('academic')" id="academic-tab" class="tab-btn px-8 py-3.5 rounded-2xl text-sm font-black text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-all flex items-center gap-3 whitespace-nowrap">
+                    <span class="material-symbols-outlined text-xl">school</span> Akademik
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="space-y-10">
+            <!-- Data Pribadi -->
+            <div id="profile" class="tab-content transition-all duration-500 block opacity-100 translate-y-0">
+                <div class="bg-white dark:bg-slate-800 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+                    <div class="p-6 sm:p-10 border-b border-slate-50 dark:border-slate-700/50 flex items-center gap-4 sm:gap-5">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
+                            <span class="material-symbols-outlined text-2xl sm:text-3xl">person</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">Data Pribadi</h3>
+                            <p class="text-[9px] sm:text-sm text-slate-400 font-bold uppercase tracking-widest mt-0.5 sm:mt-1">Identitas Lengkap Siswa</p>
+                        </div>
+                    </div>
+                    <div class="p-6 sm:p-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-8 sm:gap-y-10 gap-x-16">
+                        <div class="space-y-2">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Nama Lengkap</p>
+                            <p class="text-slate-900 dark:text-white font-black text-lg">{{ $siswa->nama_lengkap }}</p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Nama Panggilan</p>
+                            <p class="text-slate-900 dark:text-white font-bold text-lg">{{ $siswa->nama_panggilan ?: '-' }}</p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">NIK</p>
+                            <p class="text-slate-900 dark:text-white font-black text-lg font-mono tracking-tighter bg-slate-50 dark:bg-slate-900/50 px-3 py-1 rounded-lg inline-block">{{ $siswa->nik }}</p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Tempat, Tgl Lahir</p>
+                            <p class="text-slate-900 dark:text-white font-bold text-lg">
+                                {{ $siswa->tempat_lahir }}, {{ $siswa->tanggal_lahir->translatedFormat('d F Y') }}
+                            </p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Jenis Kelamin</p>
+                            <div class="flex items-center gap-3">
+                                @if($siswa->jenis_kelamin == 'L')
+                                    <div class="px-4 py-2 rounded-xl bg-blue-50 text-blue-600 font-black text-sm flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-blue-600"></span> Laki-laki
+                                    </div>
+                                @else
+                                    <div class="px-4 py-2 rounded-xl bg-pink-50 text-pink-600 font-black text-sm flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-pink-600"></span> Perempuan
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Agama</p>
+                            <p class="text-slate-900 dark:text-white font-bold text-lg">{{ $siswa->agama }}</p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Anak Ke</p>
+                            <p class="text-slate-900 dark:text-white font-black text-xl">{{ $siswa->anak_ke ?: '-' }}</p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Bahasa Sehari-hari</p>
+                            <p class="text-slate-900 dark:text-white font-bold text-lg">{{ $siswa->bahasa_sehari_hari ?: '-' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alamat & Kesehatan -->
+            <div id="address" class="tab-content hidden transition-all duration-500">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <!-- Alamat -->
+                    <div class="bg-white dark:bg-slate-800 rounded-[2.5rem] border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col">
+                        <div class="p-6 sm:p-10 border-b border-slate-50 dark:border-slate-700/50 flex items-center gap-4 sm:gap-5">
+                            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined text-2xl sm:text-3xl">location_on</span>
+                            </div>
+                            <div>
+                                <h3 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">Domisili & Jarak</h3>
+                                <p class="text-[9px] sm:text-sm text-slate-400 font-bold uppercase tracking-widest mt-0.5 sm:mt-1">Detail Tempat Tinggal</p>
+                            </div>
+                        </div>
+                        <div class="p-6 sm:p-10 flex-1 flex flex-col justify-between space-y-8 sm:space-y-10">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8">
+                                <div class="bg-slate-50 dark:bg-slate-900/50 p-5 sm:p-6 rounded-3xl space-y-1">
+                                    <p class="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest">Jarak Rumah</p>
+                                    <p class="text-slate-900 dark:text-white font-black text-xl sm:text-2xl tracking-tight">{{ $siswa->jarak_rumah_ke_sekolah ?: '0' }} <span class="text-[10px] font-bold opacity-50">Meter</span></p>
+                                </div>
+                                <div class="bg-slate-50 dark:bg-slate-900/50 p-5 sm:p-6 rounded-3xl space-y-1">
+                                    <p class="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest">Waktu Tempuh</p>
+                                    <p class="text-slate-900 dark:text-white font-black text-xl sm:text-2xl tracking-tight">{{ $siswa->waktu_tempuh_ke_sekolah ?: '0' }} <span class="text-[10px] font-bold opacity-50">Menit</span></p>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">Alamat Lengkap</p>
+                                <p class="text-slate-900 dark:text-white font-bold text-lg leading-relaxed">{{ $siswa->alamat }}</p>
+                                <div class="flex flex-wrap gap-2 mt-4">
+                                    @foreach(['kelurahan', 'kecamatan', 'kota_kabupaten', 'provinsi'] as $geo)
+                                        <span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest">{{ $siswa->$geo }}</span>
+                                    @endforeach
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-8 pt-8 border-t border-slate-50 dark:border-slate-700/50">
+                                <div class="space-y-1">
+                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tinggal Bersama</p>
+                                    <p class="text-slate-900 dark:text-white font-black tracking-tight text-lg">{{ $siswa->tinggal_bersama ?: '-' }}</p>
+                                </div>
+                                <div class="space-y-1">
+                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Status Hunian</p>
+                                    <p class="text-slate-900 dark:text-white font-black tracking-tight text-lg">{{ $siswa->status_tempat_tinggal ?: '-' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kesehatan -->
+                    <div class="bg-white dark:bg-slate-800 rounded-[2.5rem] border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col">
+                        <div class="p-6 sm:p-10 border-b border-slate-50 dark:border-slate-700/50 flex items-center gap-4 sm:gap-5">
+                            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined text-2xl sm:text-3xl">medical_services</span>
+                            </div>
+                            <div>
+                                <h3 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">Kondisi Kesehatan</h3>
+                                <p class="text-[9px] sm:text-sm text-slate-400 font-bold uppercase tracking-widest mt-0.5 sm:mt-1">Status Fisik & Medis</p>
+                            </div>
+                        </div>
+                        <div class="p-6 sm:p-10 flex-1 flex flex-col justify-between space-y-8 sm:space-y-10">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                                <div class="bg-rose-50/50 dark:bg-rose-950/20 p-5 sm:p-6 rounded-3xl text-center space-y-1">
+                                    <p class="text-[9px] sm:text-[10px] font-black text-rose-400 uppercase tracking-widest">Berat</p>
+                                    <p class="text-rose-900 dark:text-rose-200 font-black text-xl sm:text-2xl tracking-tighter">{{ $siswa->berat_badan ?: '-' }}<span class="text-xs ml-0.5 uppercase">kg</span></p>
+                                </div>
+                                <div class="bg-blue-50/50 dark:bg-blue-950/20 p-5 sm:p-6 rounded-3xl text-center space-y-1">
+                                    <p class="text-[9px] sm:text-[10px] font-black text-blue-400 uppercase tracking-widest">Tinggi</p>
+                                    <p class="text-blue-900 dark:text-blue-200 font-black text-xl sm:text-2xl tracking-tighter">{{ $siswa->tinggi_badan ?: '-' }}<span class="text-xs ml-0.5 uppercase">cm</span></p>
+                                </div>
+                                <div class="bg-emerald-50/50 dark:bg-emerald-950/20 p-5 sm:p-6 rounded-3xl text-center space-y-1">
+                                    <p class="text-[9px] sm:text-[10px] font-black text-emerald-400 uppercase tracking-widest">GOL Darah</p>
+                                    <p class="text-emerald-900 dark:text-emerald-200 font-black text-xl sm:text-2xl tracking-tighter">{{ $siswa->golongan_darah ?: '-' }}</p>
+                                </div>
+                            </div>
+                            <div class="space-y-8">
+                                <div class="space-y-2">
+                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">Riwayat Penyakit Pernah Diderita</p>
+                                    <div class="p-6 bg-slate-50 dark:bg-slate-900/50 rounded-3xl min-h-[80px]">
+                                        <p class="text-slate-900 dark:text-white font-bold leading-relaxed">{{ $siswa->penyakit_pernah_diderita ?: 'Tidak ada catatan riwayat penyakit.' }}</p>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">Riwayat Imunisasi</p>
+                                    <div class="p-6 bg-slate-50 dark:bg-slate-900/50 rounded-3xl min-h-[80px]">
+                                        <p class="text-slate-900 dark:text-white font-bold leading-relaxed">{{ $siswa->imunisasi ?: 'Tidak ada catatan riwayat imunisasi.' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Orang Tua -->
+            <div id="family" class="tab-content hidden transition-all duration-500">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <!-- Ayah -->
+                    <div class="bg-white dark:bg-slate-800 rounded-[2.5rem] border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
+                        <div class="p-6 sm:p-10 border-b border-slate-50 dark:border-slate-700/50 flex items-center justify-between">
+                            <div class="flex items-center gap-4 sm:gap-5">
+                                <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+                                    <span class="material-symbols-outlined text-2xl sm:text-3xl">man</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">Data Ayah</h3>
+                                    <p class="text-[9px] sm:text-sm text-slate-400 font-bold uppercase tracking-widest mt-0.5 sm:mt-1">Identitas Orang Tua</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6 sm:p-10 grid grid-cols-1 sm:grid-cols-2 gap-y-8 sm:gap-y-10 gap-x-10">
+                            <div class="sm:col-span-2 space-y-2">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Nama Lengkap</p>
+                                <p class="text-slate-900 dark:text-white font-black text-xl tracking-tight">{{ $siswa->nama_ayah }}</p>
+                            </div>
+                            <div class="space-y-2 text-sm sm:text-base">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">NIK Ayah</p>
+                                <p class="text-slate-900 dark:text-white font-black font-mono tracking-tighter bg-slate-50 dark:bg-slate-900/50 px-3 py-1 rounded-lg inline-block">{{ $siswa->nik_ayah ?: '-' }}</p>
+                            </div>
+                            <div class="space-y-2 text-sm sm:text-base">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Pendidikan Terakhir</p>
+                                <p class="text-slate-900 dark:text-white font-bold">{{ $siswa->pendidikan_ayah ?: '-' }}</p>
+                            </div>
+                            <div class="space-y-2 text-sm sm:text-base">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Pekerjaan Utama</p>
+                                <p class="text-slate-900 dark:text-white font-bold">{{ $siswa->pekerjaan_ayah ?: '-' }}</p>
+                            </div>
+                            <div class="space-y-2 text-sm sm:text-base">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Penghasilan Bulanan</p>
+                                <p class="text-slate-900 dark:text-white font-black text-lg tracking-tight">{{ $siswa->penghasilan_per_bulan_ayah ?: '-' }}</p>
+                            </div>
+                            <div class="sm:col-span-2 p-5 sm:p-6 bg-emerald-50/50 dark:bg-emerald-950/20 rounded-3xl flex flex-col sm:flex-row items-center gap-4 sm:gap-5 border border-emerald-100 dark:border-emerald-900/30">
+                                <div class="w-14 h-14 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20 flex-shrink-0">
+                                    <span class="material-symbols-outlined text-2xl font-bold">call</span>
+                                </div>
+                                <div class="text-center sm:text-left">
+                                    <p class="text-[9px] sm:text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-[0.2em] mb-0.5">Nomor Telepon / WhatsApp</p>
+                                    <p class="text-emerald-900 dark:text-emerald-200 font-black text-lg sm:text-xl tracking-widest">{{ $siswa->nomor_telepon_ayah ?: '-' }}</p>
+                                </div>
+                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $siswa->nomor_telepon_ayah) }}" target="_blank" 
+                                   class="sm:ml-auto w-full sm:w-12 h-12 rounded-2xl bg-white text-emerald-600 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all shadow-sm group">
+                                    <i class="fab fa-whatsapp text-2xl group-hover:scale-110 transition-transform"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ibu -->
+                    <div class="bg-white dark:bg-slate-800 rounded-[2.5rem] border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
+                        <div class="p-6 sm:p-10 border-b border-slate-50 dark:border-slate-700/50 flex items-center gap-4 sm:gap-5">
+                            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-pink-50 text-pink-600 flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined text-2xl sm:text-3xl">woman</span>
+                            </div>
+                            <div>
+                                <h3 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">Data Ibu</h3>
+                                <p class="text-[9px] sm:text-sm text-slate-400 font-bold uppercase tracking-widest mt-0.5 sm:mt-1">Identitas Orang Tua</p>
+                            </div>
+                        </div>
+                        <div class="p-6 sm:p-10 grid grid-cols-1 sm:grid-cols-2 gap-y-8 sm:gap-y-10 gap-x-10">
+                            <div class="sm:col-span-2 space-y-2">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Nama Lengkap</p>
+                                <p class="text-slate-900 dark:text-white font-black text-xl tracking-tight">{{ $siswa->nama_ibu }}</p>
+                            </div>
+                            <div class="space-y-2 text-sm sm:text-base">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">NIK Ibu</p>
+                                <p class="text-slate-900 dark:text-white font-black font-mono tracking-tighter bg-slate-50 dark:bg-slate-900/50 px-3 py-1 rounded-lg inline-block">{{ $siswa->nik_ibu ?: '-' }}</p>
+                            </div>
+                            <div class="space-y-2 text-sm sm:text-base">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Pendidikan Terakhir</p>
+                                <p class="text-slate-900 dark:text-white font-bold">{{ $siswa->pendidikan_ibu ?: '-' }}</p>
+                            </div>
+                            <div class="space-y-2 text-sm sm:text-base">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Pekerjaan Utama</p>
+                                <p class="text-slate-900 dark:text-white font-bold">{{ $siswa->pekerjaan_ibu ?: '-' }}</p>
+                            </div>
+                            <div class="space-y-2 text-sm sm:text-base">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Penghasilan Bulanan</p>
+                                <p class="text-slate-900 dark:text-white font-black text-lg tracking-tight">{{ $siswa->penghasilan_per_bulan_ibu ?: '-' }}</p>
+                            </div>
+                            <div class="sm:col-span-2 p-5 sm:p-6 bg-emerald-50/50 dark:bg-emerald-950/20 rounded-3xl flex flex-col sm:flex-row items-center gap-4 sm:gap-5 border border-emerald-100 dark:border-emerald-900/30">
+                                <div class="w-14 h-14 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20 flex-shrink-0">
+                                    <span class="material-symbols-outlined text-2xl font-bold">call</span>
+                                </div>
+                                <div class="text-center sm:text-left">
+                                    <p class="text-[9px] sm:text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-[0.2em] mb-0.5">Nomor Telepon / WhatsApp</p>
+                                    <p class="text-emerald-900 dark:text-emerald-200 font-black text-lg sm:text-xl tracking-widest">{{ $siswa->nomor_telepon_ibu ?: '-' }}</p>
+                                </div>
+                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $siswa->nomor_telepon_ibu) }}" target="_blank" 
+                                   class="sm:ml-auto w-full sm:w-12 h-12 rounded-2xl bg-white text-emerald-600 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all shadow-sm group">
+                                    <i class="fab fa-whatsapp text-2xl group-hover:scale-110 transition-transform"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Wali -->
+            <div id="guardian" class="tab-content hidden transition-all duration-500">
+                <div class="bg-white dark:bg-slate-800 rounded-[2.5rem] border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
+                    <div class="p-6 sm:p-10 border-b border-slate-50 dark:border-slate-700/50 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                        <div class="flex items-center gap-4 sm:gap-5">
+                            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined text-2xl sm:text-3xl">guardian</span>
+                            </div>
+                            <div>
+                                <h3 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">Data Wali Siswa</h3>
+                                <p class="text-[9px] sm:text-sm text-slate-400 font-bold uppercase tracking-widest mt-0.5 sm:mt-1">Identitas Penanggung Jawab Alternatif</p>
+                            </div>
+                        </div>
+                        @if(!$siswa->punya_wali || !$siswa->nama_wali)
+                            <div class="px-5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/50 text-slate-400 text-[10px] font-black uppercase tracking-widest border border-slate-100 dark:border-slate-700 w-fit">Tidak Menggunakan Wali</div>
+                        @endif
+                    </div>
+                    
+                    @if($siswa->punya_wali && $siswa->nama_wali)
+                        <div class="p-6 sm:p-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-8 sm:gap-y-12 gap-x-12">
+                            <div class="sm:col-span-2 lg:col-span-1 space-y-2">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Nama Lengkap Wali</p>
+                                <p class="text-slate-900 dark:text-white font-black text-xl tracking-tight leading-tight">{{ $siswa->nama_wali }}</p>
+                            </div>
+                            <div class="space-y-2">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Hubungan Keluarga</p>
+                                <div class="inline-flex px-4 py-1.5 rounded-xl bg-purple-50 text-purple-600 font-black text-xs sm:text-sm">{{ $siswa->hubungan_dengan_anak ?: '-' }}</div>
+                            </div>
+                            <div class="space-y-2">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">NIK Wali</p>
+                                <p class="text-slate-900 dark:text-white font-black font-mono tracking-tighter bg-slate-50 dark:bg-slate-900/50 px-3 py-1 rounded-lg inline-block text-sm sm:text-base">{{ $siswa->nik_wali ?: '-' }}</p>
+                            </div>
+                            <div class="space-y-2">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Pekerjaan</p>
+                                <p class="text-slate-900 dark:text-white font-bold text-base sm:text-lg leading-snug">{{ $siswa->pekerjaan_wali ?: '-' }}</p>
+                            </div>
+                            <div class="sm:col-span-2 lg:col-span-1 space-y-2">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Kontak Wali</p>
+                                <div class="flex items-center gap-3">
+                                    <p class="text-slate-900 dark:text-white font-black text-lg sm:text-xl tracking-widest">{{ $siswa->nomor_telepon_wali ?: '-' }}</p>
+                                    @if($siswa->nomor_telepon_wali)
+                                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $siswa->nomor_telepon_wali) }}" target="_blank" class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all shadow-sm">
+                                            <i class="fab fa-whatsapp text-xl"></i>
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <div class="p-20 flex flex-col items-center justify-center text-center space-y-4">
+                            <div class="w-20 h-20 rounded-full bg-slate-50 dark:bg-slate-900/50 flex items-center justify-center text-slate-200 dark:text-slate-700">
+                                <span class="material-symbols-outlined text-5xl">person_off</span>
+                            </div>
+                            <p class="text-slate-400 font-bold tracking-tight">Siswa ini tidak terdaftar memiliki wali.<br><span class="text-xs opacity-60 font-medium tracking-normal mt-1 block">Data penanggung jawab utama menggunakan data orang tua.</span></p>
+                        </div>
                     @endif
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Kontak Utama & Informasi Sistem (di luar tab) -->
-    <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Kontak Utama -->
-        <div class="bg-white rounded-xl shadow-md overflow-hidden">
-            <div class="px-4 sm:px-6 py-3 sm:py-4 bg-yellow-50 border-b border-yellow-100">
-                <h3 class="text-base sm:text-lg font-medium text-gray-900 flex items-center">
-                    <i class="fas fa-phone mr-3 text-yellow-600"></i>
-                    Kontak Utama
-                </h3>
-            </div>
-            <div class="p-4 sm:p-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">No. HP/WA Utama</label>
-                        <p class="text-sm sm:text-base">
-                            @if($siswa->no_hp_ortu)
-                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $siswa->no_hp_ortu) }}" 
-                               target="_blank"
-                               class="text-green-600 hover:text-green-800 inline-flex items-center">
-                                <i class="fab fa-whatsapp mr-2"></i>
-                                {{ $siswa->no_hp_ortu }}
-                            </a>
+            <!-- Akademik -->
+            <div id="academic" class="tab-content hidden transition-all duration-500">
+                <div class="bg-white dark:bg-slate-800 rounded-[2.5rem] border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
+                    <div class="p-6 sm:p-10 border-b border-slate-50 dark:border-slate-700/50 flex items-center gap-4 sm:gap-5">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0">
+                            <span class="material-symbols-outlined text-2xl sm:text-3xl">school</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">Informasi Akademik</h3>
+                            <p class="text-[9px] sm:text-sm text-slate-400 font-bold uppercase tracking-widest mt-0.5 sm:mt-1">Status & Penempatan Sekolah</p>
+                        </div>
+                    </div>
+                    <div class="p-6 sm:p-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-10 sm:gap-y-12 gap-x-12">
+                        <!-- Student Photo in Academic Tab -->
+                        <div class="md:col-span-2 lg:col-span-1 border-b md:border-b-0 md:border-r border-slate-100 dark:border-slate-700 pr-0 md:pr-10 pb-10 md:pb-0 flex flex-col items-center lg:items-start text-center lg:text-left">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 w-full">Foto Siswa</p>
+                            @if($siswa->foto && Storage::disk('public')->exists($siswa->foto))
+                                <img src="{{ asset('storage/' . $siswa->foto) }}" 
+                                     alt="{{ $siswa->nama_lengkap }}" 
+                                     class="w-full max-w-[180px] sm:max-w-[200px] aspect-[3/4] rounded-3xl object-cover shadow-2xl ring-8 ring-slate-50 dark:ring-slate-900/50 mx-auto lg:mx-0">
                             @else
-                            -
+                                <div class="w-full max-w-[180px] sm:max-w-[200px] aspect-[3/4] rounded-3xl bg-slate-50 dark:bg-slate-900/50 text-slate-300 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 mx-auto lg:mx-0">
+                                    <span class="material-symbols-outlined text-6xl">person</span>
+                                    <p class="text-[10px] font-bold mt-2 uppercase tracking-widest">Tidak Ada Foto</p>
+                                </div>
                             @endif
-                        </p>
+                        </div>
+                        
+                        <div class="md:col-span-2 space-y-10 sm:space-y-12">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-12">
+                                <div class="space-y-2">
+                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Tahun Ajaran</p>
+                                    <p class="text-slate-900 dark:text-white font-black text-xl sm:text-2xl tracking-tight leading-tight">{{ $siswa->tahunAjaran->tahun_ajaran ?? $siswa->tahun_ajaran }}</p>
+                                </div>
+                                <div class="space-y-2">
+                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Kelompok Belajar</p>
+                                    <div class="px-5 py-2.5 rounded-2xl bg-indigo-50 text-indigo-600 font-black text-base sm:text-lg inline-block">Kelompok {{ $siswa->kelompok }}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-12 pt-10 sm:pt-12 border-t border-slate-50 dark:border-slate-700/50">
+                                <div class="space-y-2">
+                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Nama Kelas</p>
+                                    <p class="text-slate-900 dark:text-white font-black text-xl sm:text-2xl tracking-tight leading-tight">{{ $siswa->kelas ?: 'Belum ditentukan' }}</p>
+                                </div>
+                                <div class="space-y-2">
+                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Guru Kelas</p>
+                                    <p class="text-slate-900 dark:text-white font-bold text-lg leading-snug">{{ $siswa->guru_kelas ?: 'Belum ditentukan' }}</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Email Utama</label>
-                        <p class="text-sm sm:text-base">
-                            @if($siswa->email_ortu)
-                            <a href="mailto:{{ $siswa->email_ortu }}" class="text-blue-600 hover:text-blue-800">
-                                {{ $siswa->email_ortu }}
-                            </a>
-                            @else
-                            -
-                            @endif
-                        </p>
+                    
+                    <div class="p-6 sm:p-10 bg-slate-50/50 dark:bg-slate-900/30 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 sm:gap-10">
+                        <div class="space-y-2">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Tanggal Masuk</p>
+                            <p class="text-slate-900 dark:text-white font-black text-base sm:text-lg">{{ $siswa->tanggal_masuk->translatedFormat('d F Y') }}</p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Jalur Pendaftaran</p>
+                            <p class="text-slate-900 dark:text-white font-bold text-base sm:text-lg">{{ $siswa->jalur_masuk ? ucfirst($siswa->jalur_masuk) : 'Reguler' }}</p>
+                        </div>
+                        <div class="sm:col-span-2 md:col-span-1 space-y-2">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Catatan</p>
+                            <p class="text-slate-900 dark:text-white font-medium italic text-sm sm:text-base leading-relaxed">{{ $siswa->catatan ?: '-' }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Informasi Sistem -->
-        <div class="bg-white rounded-xl shadow-md overflow-hidden">
-            <div class="px-4 sm:px-6 py-3 sm:py-4 bg-gray-50 border-b border-gray-200">
-                <h3 class="text-base sm:text-lg font-medium text-gray-900 flex items-center">
-                    <i class="fas fa-info-circle mr-3 text-gray-600"></i>
-                    Informasi Sistem
-                </h3>
+        <!-- System & Actions Footer -->
+        <div class="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch mb-20">
+            <!-- Informasi Sistem -->
+            <div class="bg-white dark:bg-slate-800 rounded-[2rem] p-6 sm:p-8 border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col justify-center">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-900 text-slate-500 flex items-center justify-center">
+                        <span class="material-symbols-outlined">info</span>
+                    </div>
+                    <h4 class="font-black text-slate-900 dark:text-white tracking-tight">Informasi Sistem</h4>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 text-center sm:text-left">
+                    <div class="space-y-1">
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Terakhir Diperbarui</p>
+                        <p class="text-sm font-black text-slate-900 dark:text-white">{{ $siswa->updated_at->diffForHumans() }}</p>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{{ $siswa->updated_at->translatedFormat('d M Y, H:i') }}</p>
+                    </div>
+                    <div class="space-y-1 pt-6 sm:pt-0 border-t sm:border-t-0 sm:border-l border-slate-50 dark:border-slate-700/50 sm:pl-8">
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Dibuat Pada</p>
+                        <p class="text-sm font-black text-slate-900 dark:text-white">{{ $siswa->created_at->translatedFormat('d M Y') }}</p>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{{ $siswa->created_at->format('H:i') }} WIB</p>
+                    </div>
+                </div>
             </div>
-            <div class="p-4 sm:p-6">
-                <div class="grid grid-cols-2 gap-4">
+
+            <!-- Quick Actions -->
+            <div class="bg-slate-900 dark:bg-slate-950 rounded-[2rem] p-6 sm:p-8 shadow-2xl flex flex-col justify-center">
+                <div class="flex flex-col sm:flex-row gap-6 items-center justify-between text-center sm:text-left">
                     <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Dibuat Pada</label>
-                        <p class="text-sm sm:text-base">
-                            {{ $siswa->created_at->translatedFormat('d F Y') }}
-                        </p>
-                        <p class="text-xs text-gray-500">
-                            {{ $siswa->created_at->format('H:i') }} WIB
-                        </p>
+                        <h4 class="text-white font-black text-lg tracking-tight">Tindakan Cepat</h4>
+                        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-1">Kelola status & data siswa</p>
                     </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Terakhir Diupdate</label>
-                        <p class="text-sm sm:text-base">
-                            {{ $siswa->updated_at->translatedFormat('d F Y') }}
-                        </p>
-                        <p class="text-xs text-gray-500">
-                            {{ $siswa->updated_at->diffForHumans() }}
-                        </p>
+                    <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                        <button onclick="showStatusModal()" class="w-full sm:w-auto px-6 py-4 rounded-2xl bg-amber-500 text-white font-black text-xs uppercase tracking-widest shadow-lg shadow-amber-500/20 hover:scale-105 transition-all active:scale-95 flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-lg">sync</span> Update Status
+                        </button>
+                        <button onclick="confirmDelete('{{ $siswa->id }}', '{{ $siswa->nama_lengkap }}')" class="w-full sm:w-auto px-6 py-4 rounded-2xl bg-rose-600 text-white font-black text-xs uppercase tracking-widest shadow-lg shadow-rose-600/20 hover:scale-105 transition-all active:scale-95 flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-lg">delete</span> Hapus
+                        </button>
                     </div>
                 </div>
-                
-                @if($siswa->spmb_id)
-                <div class="mt-4 pt-4 border-t border-gray-200">
-                    <div class="flex items-center text-blue-600">
-                        <i class="fas fa-exchange-alt mr-2"></i>
-                        <span class="text-sm font-medium">Dikonversi dari data SPMB</span>
-                    </div>
-                    <a href="{{ route('admin.spmb.show', $siswa->spmb_id) }}" 
-                       class="text-sm text-blue-600 hover:text-blue-800 mt-1 inline-block">
-                        Lihat data SPMB asli →
-                    </a>
-                </div>
-                @endif
             </div>
         </div>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="mt-8 flex flex-wrap gap-3 justify-end border-t border-gray-200 pt-6">
-        <!-- Tombol Update Status -->
-        <button type="button" 
-                onclick="showStatusModal()"
-                class="inline-flex items-center px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg transition text-sm sm:text-base">
-            <i class="fas fa-sync-alt mr-2"></i> Update Status
-        </button>
-        
-        <!-- Tombol Edit -->
-        <a href="{{ route('admin.siswa.siswa-aktif.edit', $siswa) }}" 
-           class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition text-sm sm:text-base">
-            <i class="fas fa-edit mr-2"></i> Edit Data
-        </a>
-        
-        <!-- Tombol Hapus -->
-        <button type="button" 
-                onclick="confirmDelete({{ $siswa->id }}, '{{ $siswa->nama_lengkap }}')"
-                class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition text-sm sm:text-base">
-            <i class="fas fa-trash mr-2"></i> Hapus
-        </button>
     </div>
 </div>
 
-<!-- Status Update Modal -->
-<div id="statusModal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md transform transition-all duration-300 scale-95 opacity-0" id="statusModalContent">
-        <div class="px-5 py-4 border-b border-gray-200">
-            <div class="flex items-center justify-between">
-                <h3 class="text-lg font-semibold text-gray-900 flex items-center">
-                    <i class="fas fa-sync-alt text-yellow-500 mr-2"></i>
-                    Update Status Siswa
-                </h3>
-                <button onclick="closeStatusModal()" class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center">
-                    <i class="fas fa-times"></i>
+    <!-- Status Modal -->
+    <div id="statusModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="hideStatusModal()"></div>
+        <div class="bg-white dark:bg-slate-800 w-full max-w-lg rounded-[2.5rem] shadow-2xl relative z-10 overflow-hidden border border-slate-100 dark:border-slate-700 animate-in fade-in zoom-in duration-300">
+            <div class="p-6 sm:p-8 border-b border-slate-50 dark:border-slate-700/50 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-2xl">sync</span>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black text-slate-900 dark:text-white tracking-tight">Update Status</h3>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Ubah status akademik siswa</p>
+                    </div>
+                </div>
+                <button onclick="hideStatusModal()" class="w-10 h-10 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 transition-colors flex items-center justify-center">
+                    <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
-            <p class="text-xs text-gray-500 mt-1">
-                {{ $siswa->nama_lengkap }} • NIS: {{ $siswa->nis ?? 'NIS-' . str_pad($siswa->id, 5, '0', STR_PAD_LEFT) }}
-            </p>
-        </div>
-        
-        <div class="px-5 py-4">
-            <form id="statusForm" method="POST" action="{{ route('admin.siswa.siswa-aktif.updateStatus', $siswa) }}">
+            
+            <form action="{{ route('admin.siswa.siswa-aktif.updateStatus', $siswa) }}" method="POST" class="p-6 sm:p-8 space-y-6">
                 @csrf
                 @method('PATCH')
                 
-                <div class="mb-5">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Status Baru</label>
-                    <select name="status_siswa" id="status_select" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500" onchange="toggleTanggalKeluar()">
-                        <option value="aktif" {{ $siswa->status_siswa == 'aktif' ? 'selected' : '' }}>Aktif</option>
-                        <option value="lulus" {{ $siswa->status_siswa == 'lulus' ? 'selected' : '' }}>Lulus</option>
-                        <option value="pindah" {{ $siswa->status_siswa == 'pindah' ? 'selected' : '' }}>Pindah</option>
-                        <option value="cuti" {{ $siswa->status_siswa == 'cuti' ? 'selected' : '' }}>Cuti</option>
-                    </select>
+                <div class="space-y-4">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Pilih Status Baru</label>
+                    <div class="grid grid-cols-1 gap-3">
+                        @foreach(['aktif' => 'Aktif', 'non-aktif' => 'Non-Aktif', 'pindah' => 'Pindah', 'keluar' => 'Keluar'] as $value => $label)
+                            <label class="relative flex items-center group cursor-pointer">
+                                <input type="radio" name="status_siswa" value="{{ $value }}" {{ $siswa->status_siswa == $value ? 'checked' : '' }} class="peer h-0 w-0 opacity-0">
+                                <div class="flex-1 px-6 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 peer-checked:border-primary peer-checked:bg-primary/5 transition-all group-hover:bg-slate-50 dark:group-hover:bg-slate-700/50">
+                                    <div class="flex items-center justify-between">
+                                        <span class="font-black text-slate-700 dark:text-slate-300 peer-checked:text-primary">{{ $label }}</span>
+                                        <div class="w-5 h-5 rounded-full border-2 border-slate-200 dark:border-slate-600 peer-checked:border-primary peer-checked:bg-primary flex items-center justify-center transition-all">
+                                            <div class="w-2 h-2 rounded-full bg-white opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </label>
+                        @endforeach
+                    </div>
                 </div>
                 
-                <div id="tanggalKeluarField" class="mb-5 hidden">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Keluar</label>
-                    <input type="date" name="tanggal_keluar" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
+                <div class="space-y-3">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Alasan / Catatan Perubahan</label>
+                    <textarea name="catatan" rows="3" placeholder="Tambahkan informasi tambahan jika diperlukan..."
+                              class="w-full px-6 py-5 bg-slate-50 dark:bg-slate-900 border-2 border-transparent focus:border-primary focus:ring-0 rounded-2xl text-slate-900 dark:text-white font-bold transition-all placeholder:text-slate-300 resize-none"></textarea>
                 </div>
-                
-                <div class="mb-3">
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Catatan (Opsional)</label>
-                    <textarea name="catatan" rows="3" 
-                              class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
-                              placeholder="Tambahkan catatan..."></textarea>
-                </div>
-                
-                <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
-                    <button type="button" onclick="closeStatusModal()" 
-                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="hideStatusModal()" class="flex-1 px-6 py-4 rounded-2xl bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-black text-xs uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-slate-600 transition-all">
                         Batal
                     </button>
-                    <button type="submit" 
-                            class="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg hover:from-yellow-600 hover:to-yellow-700 flex items-center">
-                        <i class="fas fa-save mr-2"></i>Simpan Perubahan
+                    <button type="submit" class="flex-1 px-6 py-4 rounded-2xl bg-primary text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all active:scale-95">
+                        Simpan Perubahan
                     </button>
                 </div>
             </form>
         </div>
     </div>
-</div>
 
-<!-- Form Hapus (Hidden) -->
-<form id="deleteForm" method="POST" style="display: none;">
+<!-- Form Hapus -->
+<form id="deleteForm" method="POST" class="hidden">
     @csrf
     @method('DELETE')
 </form>
 
-<!-- CSRF Token untuk AJAX -->
-<meta name="csrf-token" content="{{ csrf_token() }}">
-
 <script>
-// Fungsi untuk tab switching
-function showTab(tabName) {
-    // Sembunyikan semua tab
-    document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.classList.add('hidden');
-    });
-    
-    // Hapus active class dari semua tab button
-    document.querySelectorAll('[role="tab"]').forEach(btn => {
-        btn.classList.remove('active-tab', 'border-blue-500', 'text-blue-600');
-        btn.classList.add('border-transparent');
-    });
-    
-    // Tampilkan tab yang dipilih
-    document.getElementById(tabName).classList.remove('hidden');
-    
-    // Activekan tab button
-    const activeBtn = document.getElementById(tabName + '-tab');
-    if (activeBtn) {
-        activeBtn.classList.add('active-tab', 'border-blue-500', 'text-blue-600');
-        activeBtn.classList.remove('border-transparent');
+    function showTab(tabName) {
+        // Hide all sets
+        document.querySelectorAll('.tab-content').forEach(el => {
+            el.classList.add('hidden');
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(10px)';
+        });
+        document.querySelectorAll('.tab-btn').forEach(el => {
+            el.classList.remove('active', 'bg-white', 'dark:bg-slate-700', 'shadow-sm', 'text-primary');
+            el.classList.add('text-slate-500', 'dark:text-slate-400');
+        });
+
+        // Show selected with animation
+        const activeTab = document.getElementById(tabName);
+        activeTab.classList.remove('hidden');
+        
+        // Trigger reflow
+        activeTab.offsetHeight;
+
+        activeTab.style.opacity = '1';
+        activeTab.style.transform = 'translateY(0)';
+
+        const activeBtn = document.getElementById(tabName + '-tab');
+        activeBtn.classList.add('active', 'bg-white', 'dark:bg-slate-700', 'shadow-sm', 'text-primary');
+        activeBtn.classList.remove('text-slate-500', 'dark:text-slate-400');
     }
-}
 
-// Fungsi untuk modal status
-function showStatusModal() {
-    document.getElementById('statusModal').classList.remove('hidden');
-    setTimeout(() => {
-        document.getElementById('statusModalContent').style.opacity = '1';
-        document.getElementById('statusModalContent').style.transform = 'scale(1)';
-    }, 10);
-    document.body.style.overflow = 'hidden';
-}
-
-function closeStatusModal() {
-    document.getElementById('statusModalContent').style.opacity = '0';
-    document.getElementById('statusModalContent').style.transform = 'scale(0.95)';
-    setTimeout(() => {
-        document.getElementById('statusModal').classList.add('hidden');
-        document.body.style.overflow = '';
-    }, 200);
-}
-
-// Toggle tanggal keluar berdasarkan status
-function toggleTanggalKeluar() {
-    const status = document.getElementById('status_select').value;
-    const tanggalField = document.getElementById('tanggalKeluarField');
-    
-    if (status === 'lulus' || status === 'pindah' || status === 'cuti') {
-        tanggalField.classList.remove('hidden');
-    } else {
-        tanggalField.classList.add('hidden');
-    }
-}
-
-// Fungsi hapus
-function confirmDelete(id, name) {
-    if (confirm('Apakah Anda yakin ingin menghapus data siswa "' + name + '"?\nData yang dihapus tidak dapat dikembalikan.')) {
-        const form = document.getElementById('deleteForm');
-        form.action = '/admin/siswa/' + id;
-        form.submit();
-    }
-}
-
-// Inisialisasi
-document.addEventListener('DOMContentLoaded', function() {
-    // Tampilkan tab pertama
-    showTab('profile');
-    
-    // Inisialisasi toggle tanggal keluar
-    toggleTanggalKeluar();
-});
-
-// Tutup modal saat klik di luar
-document.getElementById('statusModal')?.addEventListener('click', function(e) {
-    if (e.target === this) closeStatusModal();
-});
-
-// ESC key handler
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
+    function showStatusModal() {
         const modal = document.getElementById('statusModal');
-        if (modal && !modal.classList.contains('hidden')) {
-            closeStatusModal();
-        }
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
     }
-});
+
+    function hideStatusModal() {
+        const modal = document.getElementById('statusModal');
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
+    // Removed toggleTanggalKeluar as it's not part of the new modal structure.
+
+    function confirmDelete(id, name) {
+        Swal.fire({
+            title: 'Hapus Data Siswa?',
+            html: `Apakah Anda yakin ingin menghapus data <b>${name}</b>?<br><small class="text-rose-500 font-bold uppercase mt-2 block tracking-widest">Tindakan ini tidak dapat dibatalkan!</small>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#e11d48',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'YA, HAPUS DATA',
+            cancelButtonText: 'BATALKAN',
+            background: document.documentElement.classList.contains('dark') ? '#0f172a' : '#ffffff',
+            color: document.documentElement.classList.contains('dark') ? '#f8fafc' : '#0f172a',
+            customClass: {
+                popup: 'rounded-[2.5rem] border-none shadow-2xl p-8',
+                confirmButton: 'rounded-2xl px-8 py-4 font-black text-[10px] tracking-[0.2em]',
+                cancelButton: 'rounded-2xl px-8 py-4 font-black text-[10px] tracking-[0.2em] bg-slate-100 text-slate-600',
+                title: 'text-2xl font-black'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = document.getElementById('deleteForm');
+                form.action = `/admin/siswa-aktif/${id}`;
+                form.submit();
+            }
+        });
+    }
+
+    // Auto-init
+    document.addEventListener('DOMContentLoaded', () => {
+        showTab('profile');
+        // Removed toggleTanggalKeluar() call as the function is removed.
+    });
 </script>
 
-<style>
-.active-tab {
-    border-bottom-color: #3b82f6;
-    color: #2563eb;
-}
-
-/* Modal styles */
-#statusModalContent {
-    transition: all 0.2s ease-out;
-}
-
-/* Responsive adjustments */
-@media (max-width: 640px) {
-    .tab-content {
-        padding: 0;
-    }
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        @media (max-width: 640px) {
+            .tab-btn {
+                padding-left: 1rem;
+                padding-right: 1rem;
+                font-size: 0.75rem;
+            }
+        }
     
-    .grid {
-        gap: 1rem;
+    .active-tab {
+        color: var(--primary-color, #4f46e5);
     }
-}
 </style>
 @endsection

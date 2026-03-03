@@ -101,8 +101,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'admin']
 
     // Pastikan ini di dalam Route::prefix('admin')->name('admin.')->group(function () { ... })
     Route::prefix('siswa')->name('siswa.')->group(function () {
-
-        // Kelompok Siswa Aktif -> Nama Route: admin.siswa.siswa-aktif.index
         Route::prefix('siswa-aktif')->name('siswa-aktif.')->group(function () {
             Route::get('/', [SiswaController::class, 'indexAktif'])->name('index');
             Route::get('/create', [SiswaController::class, 'createAktif'])->name('create');
@@ -112,18 +110,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'admin']
             Route::put('/{siswa}', [SiswaController::class, 'updateAktif'])->name('update');
             Route::delete('/{siswa}', [SiswaController::class, 'destroyAktif'])->name('destroy');
             Route::patch('/{siswa}/update-status', [SiswaController::class, 'updateStatus'])->name('updateStatus');
+            Route::post('/bulk-delete', [SiswaController::class, 'bulkDelete'])->name('bulk-delete');
+            Route::post('/bulk-update', [SiswaController::class, 'bulkUpdateStatus'])->name('bulk-update-status');
         });
 
-        // Kelompok Siswa Lulus -> Nama Route: admin.siswa.siswa-lulus.index
-        // Tadi kamu tulis .name('lulus.'), saya samakan jadi .name('siswa-lulus.') biar konsisten
         Route::prefix('siswa-lulus')->name('siswa-lulus.')->group(function () {
-            Route::get('/', [SiswaController::class, 'indexLulus'])->name('index');
-            Route::get('/create', [SiswaController::class, 'createLulus'])->name('create');
-            Route::post('/', [SiswaController::class, 'storeLulus'])->name('store');
+            Route::get('/', [SiswaController::class, 'rekapLulus'])->name('index');
+            Route::get('/export', [SiswaController::class, 'exportRekapLulus'])->name('export');
+            Route::get('/tahun/{tahun}', [SiswaController::class, 'siswaByTahunLulus'])->name('by-tahun')->where('tahun', '.*');
             Route::get('/{siswa}', [SiswaController::class, 'showLulus'])->name('show');
-            Route::get('/{siswa}/edit', [SiswaController::class, 'editLulus'])->name('edit');
-            Route::put('/{siswa}', [SiswaController::class, 'updateLulus'])->name('update');
-            Route::delete('/{siswa}', [SiswaController::class, 'destroyLulus'])->name('destroy');
         });
 
         Route::get('/export', [SiswaController::class, 'export'])->name('export');

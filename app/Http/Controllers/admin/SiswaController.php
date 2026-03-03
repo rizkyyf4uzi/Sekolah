@@ -56,74 +56,8 @@ class SiswaController extends Controller
     public function indexAktif(Request $request)
     {
         Log::info('SiswaController@indexAktif called');
-        
-        try {
-            $tahunAjarans = TahunAjaran::orderBy('tahun_ajaran', 'desc')->get();
-
-            $query = Siswa::with(['tahunAjaran'])->aktif(); // Menggunakan scope aktif dari model
-            
-            // Filter pencarian
-            if ($request->filled('search')) {
-                $search = trim($request->search);
-                $query->where(function($q) use ($search) {
-                    $q->where('nama_lengkap', 'LIKE', "%{$search}%")
-                      ->orWhere('nik', 'LIKE', "%{$search}%")
-                      ->orWhere('nis', 'LIKE', "%{$search}%")
-                      ->orWhere('nisn', 'LIKE', "%{$search}%");
-                });
-            }
-            
-            // Filter kelompok
-            if ($request->filled('kelompok')) {
-                $query->where('kelompok', $request->kelompok);
-            }
-
-            // Filter tahun ajaran
-            if ($request->filled('tahun_ajaran_id')) {
-                $query->where('tahun_ajaran_id', $request->tahun_ajaran_id);
-            }
-            
-            $perPage = $request->get('per_page', 15);
-            $siswas = $query->orderBy('created_at', 'desc')->paginate($perPage);
-            
-            // Stats khusus siswa aktif
-            $stats = [
-                'total' => $siswas->total(),
-                'kelompok_a' => Siswa::aktif()->where('kelompok', 'A')->count(),
-                'kelompok_b' => Siswa::aktif()->where('kelompok', 'B')->count(),
-                'laki_laki' => Siswa::aktif()->where('jenis_kelamin', 'L')->count(),
-                'perempuan' => Siswa::aktif()->where('jenis_kelamin', 'P')->count(),
-            ];
-
-            // Jika request AJAX, kembalikan JSON untuk partial table
-            if ($request->ajax() || $request->expectsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'table_html' => view('admin.siswa.partials.table', compact('siswas'))->render(),
-                    'pagination_html' => $siswas->hasPages() ? $siswas->links('vendor.pagination.tailwind')->render() : '',
-                    'stats_html' => view('admin.siswa.siswa-aktif.partials.stats', compact('stats'))->render(),
-                    'total' => $stats['total'],
-                ]);
-            }
-
-            return view('admin.siswa.siswa-aktif.index', compact('siswas', 'stats', 'tahunAjarans'));
-            
-        } catch (\Exception $e) {
-            Log::error('Error in SiswaController@indexAktif', [
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine()
-            ]);
-            
-            if ($request->ajax() || $request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Terjadi kesalahan: ' . $e->getMessage()
-                ], 500);
-            }
-            
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-        }
+        $statusTab = 'aktif';
+        return view('admin.siswa.siswa-aktif.index', compact('statusTab'));
     }
 
     /**
@@ -148,6 +82,23 @@ class SiswaController extends Controller
         try {
             $validated = $this->validateSiswa($request);
             
+            // Set default academic values if missing (since they were removed from the form)
+            $tahunAjaranAktif = TahunAjaran::where('is_aktif', true)->first();
+            
+            if (!isset($validated['tahun_ajaran_id']) && $tahunAjaranAktif) {
+                $validated['tahun_ajaran_id'] = $tahunAjaranAktif->id;
+                $validated['tahun_ajaran'] = $tahunAjaranAktif->tahun_ajaran;
+            }
+            
+            if (!isset($validated['tanggal_masuk'])) {
+                $validated['tanggal_masuk'] = now();
+            }
+            
+            if (!isset($validated['kelompok'])) {
+                // Default to A if not specified, or implement logic based on age if needed
+                $validated['kelompok'] = 'A'; 
+            }
+
             // Set status sebagai aktif
             $validated['status_siswa'] = 'aktif';
 
@@ -296,76 +247,16 @@ class SiswaController extends Controller
     }
 
     /**
-     * Display a listing of graduated students (Siswa Lulus).
+     * Display a listing of graduated students (Siswa Lulus) - READ ONLY.
      */
     public function indexLulus(Request $request)
     {
         Log::info('SiswaController@indexLulus called');
-        
-        try {
-            $tahunAjarans = TahunAjaran::orderBy('tahun_ajaran', 'desc')->get();
-
-            $query = Siswa::with(['tahunAjaran'])->lulus(); // Menggunakan scope lulus dari model
-            
-            // Filter pencarian
-            if ($request->filled('search')) {
-                $search = trim($request->search);
-                $query->where(function($q) use ($search) {
-                    $q->where('nama_lengkap', 'LIKE', "%{$search}%")
-                      ->orWhere('nik', 'LIKE', "%{$search}%")
-                      ->orWhere('nis', 'LIKE', "%{$search}%")
-                      ->orWhere('nisn', 'LIKE', "%{$search}%");
-                });
-            }
-            
-            // Filter tahun kelulusan
-            if ($request->filled('tahun_lulus')) {
-                $query->whereYear('tanggal_keluar', $request->tahun_lulus);
-            }
-            
-            $perPage = $request->get('per_page', 15);
-            $siswas = $query->orderBy('tanggal_keluar', 'desc')->paginate($perPage);
-            
-            // Stats khusus siswa lulus
-            $stats = [
-                'total' => $siswas->total(),
-                'tahun_ini' => Siswa::lulus()->whereYear('tanggal_keluar', date('Y'))->count(),
-                'tahun_lalu' => Siswa::lulus()->whereYear('tanggal_keluar', date('Y') - 1)->count(),
-            ];
-
-            // Jika request AJAX, kembalikan JSON untuk partial table
-            if ($request->ajax() || $request->expectsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'table_html' => view('admin.siswa.partials.table', compact('siswas'))->render(),
-                    'pagination_html' => $siswas->hasPages() ? $siswas->links('vendor.pagination.tailwind')->render() : '',
-                    'stats_html' => view('admin.siswa.siswa-lulus.partials.stats', compact('stats'))->render(),
-                    'total' => $stats['total'],
-                ]);
-            }
-
-            return view('admin.siswa.siswa-lulus.index', compact('siswas', 'stats', 'tahunAjarans'));
-            
-        } catch (\Exception $e) {
-            Log::error('Error in SiswaController@indexLulus', [
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine()
-            ]);
-            
-            if ($request->ajax() || $request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Terjadi kesalahan: ' . $e->getMessage()
-                ], 500);
-            }
-            
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-        }
+        return view('admin.siswa.siswa-lulus.index');
     }
 
     /**
-     * Display the specified graduated student.
+     * Display the specified graduated student - READ ONLY.
      */
     public function showLulus(Siswa $siswa)
     {
@@ -378,159 +269,6 @@ class SiswaController extends Controller
         $siswa->load(['tahunAjaran', 'spmb']);
         
         return view('admin.siswa.siswa-lulus.show', compact('siswa'));
-    }
-
-    /**
-     * Show the form for creating a new graduated student.
-     */
-    public function createLulus()
-    {
-        $kelompok = ['A', 'B'];
-        $tahunAjaran = TahunAjaran::orderBy('tahun_ajaran', 'desc')->get();
-        
-        return view('admin.siswa.siswa-lulus.create', compact('kelompok', 'tahunAjaran'));
-    }
-
-    /**
-     * Store a newly created graduated student in storage.
-     */
-    public function storeLulus(Request $request)
-    {
-        DB::beginTransaction();
-        
-        try {
-            $validated = $this->validateSiswa($request);
-            
-            // Set status sebagai lulus dan tanggal keluar
-            $validated['status_siswa'] = 'lulus';
-            $validated['tanggal_keluar'] = $validated['tanggal_keluar'] ?? now();
-
-            // Handle foto upload
-            if ($request->hasFile('foto')) {
-                $fotoPath = $request->file('foto')->store('siswa/foto', 'public');
-                $validated['foto'] = $fotoPath;
-            }
-
-            // Set default values
-            $validated['punya_wali'] = $request->has('punya_wali');
-
-            Log::info('SiswaController@storeLulus - saving data', $validated);
-
-            $siswa = Siswa::create($validated);
-
-            DB::commit();
-
-            return redirect()->route('admin.siswa.siswa-lulus.show', $siswa)
-                ->with('success', 'Data siswa lulus berhasil ditambahkan.');
-
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            DB::rollBack();
-            return back()->withErrors($e->validator)->withInput()->with('error', 'Validasi gagal');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error in SiswaController@storeLulus', ['message' => $e->getMessage()]);
-            return back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Show the form for editing the specified graduated student.
-     */
-    public function editLulus(Siswa $siswa)
-    {
-        // Pastikan siswa yang diedit adalah lulus
-        if (!$siswa->isLulus()) {
-            return redirect()->route('admin.siswa.siswa-lulus.index')
-                ->with('error', 'Siswa tidak ditemukan atau bukan siswa lulus.');
-        }
-        
-        $kelompok = ['A', 'B'];
-        $tahunAjaran = TahunAjaran::orderBy('tahun_ajaran', 'desc')->get();
-        
-        return view('admin.siswa.siswa-lulus.edit', compact('siswa', 'kelompok', 'tahunAjaran'));
-    }
-
-    /**
-     * Update the specified graduated student in storage.
-     */
-    public function updateLulus(Request $request, Siswa $siswa)
-    {
-        // Pastikan siswa yang diupdate adalah lulus
-        if (!$siswa->isLulus()) {
-            return redirect()->route('admin.siswa.siswa-lulus.index')
-                ->with('error', 'Siswa tidak ditemukan atau bukan siswa lulus.');
-        }
-        
-        DB::beginTransaction();
-        
-        try {
-            $validated = $this->validateSiswa($request, $siswa->id);
-
-            // Handle foto upload
-            if ($request->hasFile('foto')) {
-                // Hapus foto lama jika ada
-                if ($siswa->foto && Storage::disk('public')->exists($siswa->foto)) {
-                    Storage::disk('public')->delete($siswa->foto);
-                }
-                
-                $fotoPath = $request->file('foto')->store('siswa/foto', 'public');
-                $validated['foto'] = $fotoPath;
-            }
-
-            // Set boolean values
-            $validated['punya_wali'] = $request->has('punya_wali');
-
-            Log::info('SiswaController@updateLulus - updating data', $validated);
-
-            $siswa->update($validated);
-
-            DB::commit();
-
-            return redirect()->route('admin.siswa.siswa-lulus.show', $siswa)
-                ->with('success', 'Data siswa lulus berhasil diperbarui.');
-
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            DB::rollBack();
-            return back()->withErrors($e->validator)->withInput()->with('error', 'Validasi gagal');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error in SiswaController@updateLulus', ['message' => $e->getMessage()]);
-            return back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Remove the specified graduated student from storage.
-     */
-    public function destroyLulus(Siswa $siswa)
-    {
-        // Pastikan siswa yang dihapus adalah lulus
-        if (!$siswa->isLulus()) {
-            return redirect()->route('admin.siswa.siswa-lulus.index')
-                ->with('error', 'Siswa tidak ditemukan atau bukan siswa lulus.');
-        }
-        
-        DB::beginTransaction();
-        
-        try {
-            // Hapus foto jika ada
-            if ($siswa->foto && Storage::disk('public')->exists($siswa->foto)) {
-                Storage::disk('public')->delete($siswa->foto);
-            }
-
-            // Hapus data siswa
-            $siswa->delete();
-
-            DB::commit();
-
-            return redirect()->route('admin.siswa.siswa-lulus.index')
-                ->with('success', 'Data siswa lulus berhasil dihapus.');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error in SiswaController@destroyLulus', ['message' => $e->getMessage()]);
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-        }
     }
 
     /**
@@ -703,7 +441,8 @@ class SiswaController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Status ' . $count . ' siswa berhasil diperbarui.'
+                'message' => 'Status ' . $count . ' siswa berhasil diperbarui.',
+                'redirect_to' => $validated['status_siswa'] === 'lulus' ? 'lulus' : 'aktif'
             ]);
 
         } catch (\Exception $e) {
@@ -717,92 +456,134 @@ class SiswaController extends Controller
     }
 
     /**
+     * Bulk delete siswa (Hapus massal)
+     */
+    public function bulkDelete(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|string',
+        ]);
+
+        DB::beginTransaction();
+        
+        try {
+            $ids = explode(',', $validated['ids']);
+            $siswas = Siswa::whereIn('id', $ids)->get();
+            $count = 0;
+            
+            foreach ($siswas as $siswa) {
+                // Hapus foto jika ada
+                if ($siswa->foto && Storage::disk('public')->exists($siswa->foto)) {
+                    Storage::disk('public')->delete($siswa->foto);
+                }
+                
+                $siswa->delete();
+                $count++;
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => $count . ' data siswa berhasil dihapus.'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error in SiswaController@bulkDelete', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Validation method untuk menghindari duplikasi kode
      */
     private function validateSiswa(Request $request, $id = null)
     {
         $rules = [
-            // Data siswa
-            'nik' => 'required|digits:16|unique:siswas,nik' . ($id ? ',' . $id : ''),
-            'nis' => 'nullable|string|max:50|unique:siswas,nis' . ($id ? ',' . $id : ''),
-            'nisn' => 'nullable|string|max:50|unique:siswas,nisn' . ($id ? ',' . $id : ''),
+            // Data Calon Siswa
             'nama_lengkap' => 'required|string|max:255',
             'nama_panggilan' => 'nullable|string|max:100',
+            'nik' => 'required|numeric|digits:16|unique:siswas,nik' . ($id ? ',' . $id : ''),
+            'nis' => 'required|numeric|digits_between:5,15|unique:siswas,nis' . ($id ? ',' . $id : ''),
+            'nisn' => 'required|numeric|digits:10|unique:siswas,nisn' . ($id ? ',' . $id : ''),
             'tempat_lahir' => 'required|string|max:100',
-            'tanggal_lahir' => 'required|date',
+            'tanggal_lahir' => 'required|date|before_or_equal:today',
             'jenis_kelamin' => 'required|in:L,P',
-            'agama' => 'nullable|in:Islam,Kristen Protestan,Kristen Katolik,Hindu,Buddha,Konghucu,Lainnya',
-            
-            // Alamat
-            'alamat' => 'required|string',
-            'provinsi' => 'nullable|string|max:100',
-            'kota_kabupaten' => 'nullable|string|max:100',
-            'kecamatan' => 'nullable|string|max:100',
-            'kelurahan' => 'nullable|string|max:100',
-            'nama_jalan' => 'nullable|string|max:255',
-            
-            // Data kesehatan
-            'berat_badan' => 'nullable|numeric|min:0|max:200',
-            'tinggi_badan' => 'nullable|numeric|min:0|max:200',
+            'agama' => 'required|in:Islam,Kristen Protestan,Kristen Katolik,Hindu,Buddha,Konghucu,Lainnya',
+            'anak_ke' => 'required|integer|min:1',
+            'tinggal_bersama' => 'required|string',
+            'status_tempat_tinggal' => 'required|string',
+            'bahasa_sehari_hari' => 'required|string|max:100',
+            'jarak_rumah_ke_sekolah' => 'nullable|integer',
+            'waktu_tempuh_ke_sekolah' => 'nullable|integer',
+            'berat_badan' => 'nullable|numeric',
+            'tinggi_badan' => 'nullable|numeric',
             'golongan_darah' => 'nullable|in:A,B,AB,O',
             'penyakit_pernah_diderita' => 'nullable|string',
             'imunisasi' => 'nullable|string',
             
-            // Data ayah
+            // Alamat Domisili
+            'alamat' => 'required|string',
+            'provinsi' => 'required|string|max:100',
+            'kota_kabupaten' => 'required|string|max:100',
+            'kecamatan' => 'required|string|max:100',
+            'kelurahan' => 'required|string|max:100',
+            'nama_jalan' => 'required|string|max:255',
+
+            // Alamat KK (conditional)
+            'alamat_kk_sama' => 'nullable|boolean',
+            'provinsi_kk' => 'required_without:alamat_kk_sama|nullable|string|max:100',
+            'kota_kabupaten_kk' => 'required_without:alamat_kk_sama|nullable|string|max:100',
+            'kecamatan_kk' => 'required_without:alamat_kk_sama|nullable|string|max:100',
+            'kelurahan_kk' => 'required_without:alamat_kk_sama|nullable|string|max:100',
+            'nama_jalan_kk' => 'required_without:alamat_kk_sama|nullable|string|max:255',
+            'alamat_kk' => 'nullable|string',
+            
+            // Data Ayah
             'nama_ayah' => 'required|string|max:255',
-            'nik_ayah' => 'nullable|digits:16',
-            'tempat_lahir_ayah' => 'nullable|string|max:100',
-            'tanggal_lahir_ayah' => 'nullable|date',
-            'pendidikan_ayah' => 'nullable|string|max:100',
-            'pekerjaan_ayah' => 'nullable|string|max:100',
-            'bidang_pekerjaan_ayah' => 'nullable|string|max:100',
-            'penghasilan_ayah' => 'nullable|string|max:100',
-            'no_hp_ayah' => 'nullable|string|max:20',
-            'email_ayah' => 'nullable|email|max:255',
+            'nik_ayah' => 'required|numeric|digits:16',
+            'tempat_lahir_ayah' => 'required|string|max:100',
+            'tanggal_lahir_ayah' => 'required|date|before_or_equal:today',
+            'pendidikan_ayah' => 'nullable|string',
+            'pekerjaan_ayah' => 'nullable|string',
+            'penghasilan_per_bulan_ayah' => 'nullable|string',
+            'nomor_telepon_ayah' => 'required|numeric|digits_between:10,15',
             
-            // Data ibu
+            // Data Ibu
             'nama_ibu' => 'required|string|max:255',
-            'nik_ibu' => 'nullable|digits:16',
-            'tempat_lahir_ibu' => 'nullable|string|max:100',
-            'tanggal_lahir_ibu' => 'nullable|date',
-            'pendidikan_ibu' => 'nullable|string|max:100',
-            'pekerjaan_ibu' => 'nullable|string|max:100',
-            'bidang_pekerjaan_ibu' => 'nullable|string|max:100',
-            'penghasilan_ibu' => 'nullable|string|max:100',
-            'no_hp_ibu' => 'nullable|string|max:20',
-            'email_ibu' => 'nullable|email|max:255',
+            'nik_ibu' => 'required|numeric|digits:16',
+            'tempat_lahir_ibu' => 'required|string|max:100',
+            'tanggal_lahir_ibu' => 'required|date|before_or_equal:today',
+            'pendidikan_ibu' => 'nullable|string',
+            'pekerjaan_ibu' => 'nullable|string',
+            'penghasilan_per_bulan_ibu' => 'nullable|string',
+            'nomor_telepon_ibu' => 'required|numeric|digits_between:10,15',
             
-            // Data wali
+            // Data Wali
             'punya_wali' => 'nullable|boolean',
-            'nama_wali' => 'nullable|required_if:punya_wali,1|string|max:255',
-            'hubungan_wali' => 'nullable|required_if:punya_wali,1|string|max:100',
-            'nik_wali' => 'nullable|digits:16',
-            'pekerjaan_wali' => 'nullable|string|max:100',
-            'nomor_telepon_wali' => 'nullable|string|max:20',
-            
-            // Kontak
-            'no_hp_ortu' => 'required|string|max:20',
-            'email_ortu' => 'nullable|email|max:255',
-            
-            // Informasi akademik
-            'kelompok' => 'required|in:A,B',
-            'tahun_ajaran_id' => 'required|exists:tahun_ajarans,id',
-            'tahun_ajaran' => 'required|string|max:9',
-            'tanggal_masuk' => 'required|date',
-            'tanggal_keluar' => 'nullable|date|after_or_equal:tanggal_masuk',
-            'jalur_masuk' => 'nullable|in:zonasi,afirmasi,prestasi,mutasi,reguler',
-            
-            // Kelas
-            'kelas' => 'nullable|string|max:50',
-            'guru_kelas' => 'nullable|string|max:255',
-            
-            // Catatan
-            'catatan' => 'nullable|string',
-            
-            // Foto
+            'nama_wali' => 'required_if:punya_wali,1|nullable|string|max:255',
+            'nik_wali' => 'required_if:punya_wali,1|nullable|numeric|digits:16',
+            'tempat_lahir_wali' => 'required_if:punya_wali,1|nullable|string|max:100',
+            'tanggal_lahir_wali' => 'required_if:punya_wali,1|nullable|date|before_or_equal:today',
+            'nomor_telepon_wali' => 'required_if:punya_wali,1|nullable|numeric|digits_between:10,15',
+            'hubungan_dengan_anak' => 'required_if:punya_wali,1|nullable|string',
+            'pendidikan_wali' => 'nullable|string',
+            'pekerjaan_wali' => 'nullable|string',
+
+            // Akademik & Foto
             'foto' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
         ];
 
+        // Filter out fields that are no longer used or redundant
         return $request->validate($rules);
     }
 
@@ -853,5 +634,69 @@ class SiswaController extends Controller
     public function destroy(Siswa $siswa)
     {
         return redirect()->route('admin.siswa.index');
+    }
+
+    /**
+     * Display a listing of graduated students recap by academic year.
+     */
+    public function rekapLulus(Request $request)
+    {
+        Log::info('SiswaController@rekapLulus called');
+        $statusTab = 'lulus';
+        return view('admin.siswa.siswa-lulus.index', compact('statusTab'));
+    }
+
+    /**
+     * Display list of graduated students by academic year.
+     */
+    public function siswaByTahunLulus(Request $request, $tahun)
+    {
+        Log::info('SiswaController@siswaByTahunLulus called', ['tahun' => $tahun]);
+        $tahunAjaran = $tahun;
+        return view('admin.siswa.siswa-lulus.by-tahun', compact('tahunAjaran'));
+    }
+
+    /**
+         * Export rekap lulus to CSV
+     */
+    public function exportRekapLulus(Request $request)
+    {
+        try {
+            $rekap = Siswa::lulus()
+                ->select('tahun_ajaran', DB::raw('count(*) as jumlah_siswa'))
+                ->groupBy('tahun_ajaran')
+                ->orderBy('tahun_ajaran', 'desc')
+                ->get();
+            
+            $filename = 'rekap_lulus_' . date('Ymd_His') . '.csv';
+            $headers = [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            ];
+            
+            $callback = function() use ($rekap) {
+                $file = fopen('php://output', 'w');
+                
+                // Header CSV
+                fputcsv($file, ['No', 'Tahun Ajaran', 'Jumlah Siswa Lulus']);
+                
+                // Data
+                foreach ($rekap as $index => $item) {
+                    fputcsv($file, [
+                        $index + 1,
+                        $item->tahun_ajaran,
+                        $item->jumlah_siswa . ' Siswa'
+                    ]);
+                }
+                
+                fclose($file);
+            };
+            
+            return response()->stream($callback, 200, $headers);
+            
+        } catch (\Exception $e) {
+            Log::error('Error in SiswaController@exportRekapLulus', ['message' => $e->getMessage()]);
+            return back()->with('error', 'Gagal mengekspor data: ' . $e->getMessage());
+        }
     }
 }

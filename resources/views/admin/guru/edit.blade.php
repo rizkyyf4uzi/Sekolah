@@ -1,22 +1,23 @@
 @extends('layouts.admin')
 
-@section('title', 'Tambah Guru & Staff')
-@section('breadcrumb', 'Tambah Guru')
+@section('title', 'Edit Guru & Staff')
+@section('breadcrumb', 'Edit Guru')
 
 @section('content')
 <div class="max-w-5xl mx-auto pb-20">
     <!-- Header Page -->
     <div class="mb-10 text-center">
-        <h1 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-3">Registrasi Guru <span class="text-primary">&</span> Staff</h1>
+        <h1 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-3">Pembaruan Data <span class="text-primary">Guru</span></h1>
         <p class="text-sm font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center justify-center gap-2">
             <span class="w-8 h-[2px] bg-primary rounded-full"></span>
-            Lengkapi data pendidik dan tenaga kependidikan baru
+            Perbarui informasi pendidik dan tenaga kependidikan
             <span class="w-8 h-[2px] bg-primary rounded-full"></span>
         </p>
     </div>
 
-    <form action="{{ route('admin.guru.store') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
+    <form action="{{ route('admin.guru.update', $guru->id) }}" method="POST" enctype="multipart/form-data" class="space-y-8">
         @csrf
+        @method('PUT')
         
         <!-- Section A: Identitas Pribadi -->
         <div class="bg-white dark:bg-slate-800 rounded-[2.5rem] border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden border-b-4 border-b-primary/10">
@@ -39,7 +40,7 @@
                             <span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors text-lg">badge</span>
                         </div>
                         <input type="text" id="nip" name="nip" 
-                               value="{{ old('nip') }}"
+                               value="{{ old('nip', $guru->nip) }}"
                                class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border-transparent rounded-2xl focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-sm font-bold text-slate-600 dark:text-slate-300 placeholder:text-slate-300"
                                placeholder="19800101XXXXXXXXXX">
                     </div>
@@ -54,7 +55,7 @@
                             <span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors text-lg">person</span>
                         </div>
                         <input type="text" id="nama" name="nama" required
-                               value="{{ old('nama') }}"
+                               value="{{ old('nama', $guru->nama) }}"
                                class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border-transparent rounded-2xl focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-sm font-bold text-slate-600 dark:text-slate-300 placeholder:text-slate-300"
                                placeholder="Contoh: Ahmad Subardjo, S.Pd.">
                     </div>
@@ -69,7 +70,7 @@
                             <span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors text-lg">location_on</span>
                         </div>
                         <input type="text" id="tempat_lahir" name="tempat_lahir"
-                               value="{{ old('tempat_lahir') }}"
+                               value="{{ old('tempat_lahir', $guru->tempat_lahir) }}"
                                class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border-transparent rounded-2xl focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-sm font-bold text-slate-600 dark:text-slate-300 placeholder:text-slate-300"
                                placeholder="Kota Kelahiran">
                     </div>
@@ -83,7 +84,7 @@
                             <span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors text-lg">calendar_today</span>
                         </div>
                         <input type="date" id="tanggal_lahir" name="tanggal_lahir" required
-                               value="{{ old('tanggal_lahir') }}"
+                               value="{{ old('tanggal_lahir', $guru->tanggal_lahir) }}"
                                class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border-transparent rounded-2xl focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-sm font-bold text-slate-600 dark:text-slate-300 appearance-none">
                     </div>
                     @error('tanggal_lahir') <p class="text-[10px] font-bold text-rose-500 uppercase tracking-widest animate-pulse ml-1">{{ $message }}</p> @enderror
@@ -95,7 +96,7 @@
                     <div class="grid grid-cols-2 gap-4">
                         <label class="relative cursor-pointer group">
                             <input type="radio" name="jenis_kelamin" value="L" required
-                                   {{ old('jenis_kelamin', 'L') == 'L' ? 'checked' : '' }}
+                                   {{ old('jenis_kelamin', $guru->jenis_kelamin) == 'L' ? 'checked' : '' }}
                                    class="peer hidden">
                             <div class="flex items-center justify-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 border-2 border-transparent rounded-2xl peer-checked:border-primary peer-checked:bg-primary/5 peer-checked:text-primary transition-all group-hover:bg-slate-100 dark:group-hover:bg-slate-700">
                                 <span class="material-symbols-outlined text-xl">male</span>
@@ -104,7 +105,7 @@
                         </label>
                         <label class="relative cursor-pointer group">
                             <input type="radio" name="jenis_kelamin" value="P"
-                                   {{ old('jenis_kelamin') == 'P' ? 'checked' : '' }}
+                                   {{ old('jenis_kelamin', $guru->jenis_kelamin) == 'P' ? 'checked' : '' }}
                                    class="peer hidden">
                             <div class="flex items-center justify-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 border-2 border-transparent rounded-2xl peer-checked:border-pink-500 peer-checked:bg-pink-500/5 peer-checked:text-pink-600 transition-all group-hover:bg-slate-100 dark:group-hover:bg-slate-700">
                                 <span class="material-symbols-outlined text-xl">female</span>
@@ -125,7 +126,7 @@
                                 class="w-full pl-12 pr-10 py-4 bg-slate-50 dark:bg-slate-900 border-transparent rounded-2xl focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-sm font-bold text-slate-600 dark:text-slate-300 appearance-none cursor-pointer">
                             <option value="">Pilih Pendidikan</option>
                             @foreach(['SMA' => 'SMA/Sederajat', 'D1' => 'Diploma 1', 'D2' => 'Diploma 2', 'D3' => 'Diploma 3', 'D4' => 'Diploma 4', 'S1' => 'Sarjana (S1)', 'S2' => 'Magister (S2)', 'S3' => 'Doktor (S3)'] as $val => $label)
-                                <option value="{{ $val }}" {{ old('pendidikan_terakhir') == $val ? 'selected' : '' }}>{{ $label }}</option>
+                                <option value="{{ $val }}" {{ old('pendidikan_terakhir', $guru->pendidikan_terakhir) == $val ? 'selected' : '' }}>{{ $label }}</option>
                             @endforeach
                         </select>
                         <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-300">
@@ -157,7 +158,7 @@
                             <span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors text-lg">phone_android</span>
                         </div>
                         <input type="tel" id="no_hp" name="no_hp" required
-                               value="{{ old('no_hp') }}"
+                               value="{{ old('no_hp', $guru->no_hp) }}"
                                class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border-transparent rounded-2xl focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-sm font-bold text-slate-600 dark:text-slate-300 placeholder:text-slate-300"
                                placeholder="08XXXXXXXXXX">
                     </div>
@@ -172,7 +173,7 @@
                             <span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors text-lg">alternate_email</span>
                         </div>
                         <input type="email" id="email" name="email" required
-                               value="{{ old('email') }}"
+                               value="{{ old('email', $guru->email) }}"
                                class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border-transparent rounded-2xl focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-sm font-bold text-slate-600 dark:text-slate-300 placeholder:text-slate-300"
                                placeholder="nama@email.com">
                     </div>
@@ -189,8 +190,8 @@
                         <select id="jabatan" name="jabatan" required
                                 class="w-full pl-12 pr-10 py-4 bg-slate-50 dark:bg-slate-900 border-transparent rounded-2xl focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-sm font-bold text-slate-600 dark:text-slate-300 appearance-none cursor-pointer">
                             <option value="">Pilih Jabatan</option>
-                            <option value="guru" {{ old('jabatan') == 'guru' ? 'selected' : '' }}>Guru Pengajar</option>
-                            <option value="staff" {{ old('jabatan') == 'staff' ? 'selected' : '' }}>Staff Administrasi</option>
+                            <option value="guru" {{ old('jabatan', $guru->jabatan) == 'guru' ? 'selected' : '' }}>Guru Pengajar</option>
+                            <option value="staff" {{ old('jabatan', $guru->jabatan) == 'staff' ? 'selected' : '' }}>Staff Administrasi</option>
                         </select>
                         <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-300">
                             <span class="material-symbols-outlined text-lg font-bold">expand_more</span>
@@ -209,8 +210,8 @@
                         <select id="kelompok" name="kelompok"
                                 class="w-full pl-12 pr-10 py-4 bg-slate-50 dark:bg-slate-900 border-transparent rounded-2xl focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-sm font-bold text-slate-600 dark:text-slate-300 appearance-none cursor-pointer">
                             <option value="">Pilih Kelompok</option>
-                            <option value="A" {{ old('kelompok') == 'A' ? 'selected' : '' }}>Kelompok A (Usia 4-5 th)</option>
-                            <option value="B" {{ old('kelompok') == 'B' ? 'selected' : '' }}>Kelompok B (Usia 5-6 th)</option>
+                            <option value="A" {{ old('kelompok', $guru->kelompok) == 'A' ? 'selected' : '' }}>Kelompok A (Usia 4-5 th)</option>
+                            <option value="B" {{ old('kelompok', $guru->kelompok) == 'B' ? 'selected' : '' }}>Kelompok B (Usia 5-6 th)</option>
                         </select>
                         <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-300">
                             <span class="material-symbols-outlined text-lg font-bold">expand_more</span>
@@ -228,7 +229,7 @@
                         </div>
                         <textarea id="alamat" name="alamat" rows="3" required
                                   class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border-transparent rounded-[1.5rem] focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-sm font-bold text-slate-600 dark:text-slate-300 placeholder:text-slate-300 resize-none"
-                                  placeholder="Tuliskan alamat lengkap sesuai KTP atau domisili...">{{ old('alamat') }}</textarea>
+                                  placeholder="Tuliskan alamat lengkap sesuai KTP atau domisili...">{{ old('alamat', $guru->alamat) }}</textarea>
                     </div>
                 </div>
             </div>
@@ -252,7 +253,7 @@
                         <label class="group relative flex flex-col items-center justify-center w-full aspect-square bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-[2rem] hover:bg-slate-100/50 dark:hover:bg-slate-800/50 hover:border-primary/50 transition-all cursor-pointer overflow-hidden">
                             <input type="file" id="foto" name="foto" accept="image/*" class="hidden">
                             
-                            <div id="upload-placeholder" class="flex flex-col items-center text-center p-6 transition-all">
+                            <div id="upload-placeholder" class="flex flex-col items-center text-center p-6 transition-all {{ $guru->foto ? 'hidden' : '' }}">
                                 <div class="w-16 h-16 rounded-2xl bg-white dark:bg-slate-800 flex items-center justify-center shadow-sm text-slate-400 group-hover:text-primary transition-colors mb-4">
                                     <span class="material-symbols-outlined text-3xl">add_a_photo</span>
                                 </div>
@@ -260,7 +261,9 @@
                                 <span class="text-[8px] font-bold text-slate-300 uppercase tracking-widest mt-2">JPG, PNG, JPEG (MAX 2MB)</span>
                             </div>
 
-                            <img id="preview-image" class="absolute inset-0 w-full h-full object-cover hidden transition-all duration-300">
+                            <img id="preview-image" 
+                                 src="{{ $guru->foto ? asset('storage/' . $guru->foto) : '' }}"
+                                 class="absolute inset-0 w-full h-full object-cover {{ $guru->foto ? '' : 'hidden' }} transition-all duration-300">
                             
                             <div id="change-overlay" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm items-center justify-center hidden group-hover:flex transition-all">
                                 <span class="text-white text-[10px] font-black uppercase tracking-widest">Ganti Foto</span>
@@ -270,25 +273,18 @@
                     </div>
 
                     <div class="flex-1 space-y-4">
-                        <div class="p-6 rounded-3xl bg-amber-50/50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/20">
-                            <h4 class="text-xs font-black text-amber-700 dark:text-amber-500 uppercase tracking-widest mb-2 flex items-center gap-2">
-                                <span class="material-symbols-outlined text-lg font-bold">lightbulb</span>
-                                Tips Foto Formal
+                        <div class="p-6 rounded-3xl bg-amber-50/50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/20 text-center md:text-left">
+                            <h4 class="text-xs font-black text-amber-700 dark:text-amber-500 uppercase tracking-widest mb-2 flex items-center justify-center md:justify-start gap-2">
+                                <span class="material-symbols-outlined text-lg font-bold">info</span>
+                                Status Foto
                             </h4>
-                            <ul class="text-[10px] font-bold text-slate-500 dark:text-slate-400 space-y-2 uppercase tracking-widest">
-                                <li class="flex items-start gap-2">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1 flex-shrink-0"></span>
-                                    Latar belakang polos berwarna (Biru/Merah)
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1 flex-shrink-0"></span>
-                                    Pakaian formal (Seragam/Batik)
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1 flex-shrink-0"></span>
-                                    Sudut pandang lurus dengan wajah yang jelas
-                                </li>
-                            </ul>
+                            <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                                @if($guru->foto)
+                                    Guru saat ini memiliki foto profil aktif. Mengunggah berkas baru akan menggantikan foto lama secara permanen.
+                                @else
+                                    Guru belum memiliki foto profil. Harap unggah foto formal terbaru.
+                                @endif
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -304,8 +300,8 @@
             <button type="submit" 
                     id="submit-btn"
                     class="w-full sm:w-auto px-10 py-4 rounded-2xl bg-primary text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-105 transition-all active:scale-95 flex items-center justify-center gap-3">
-                <span class="material-symbols-outlined text-lg">save</span>
-                Simpan Data Guru
+                <span class="material-symbols-outlined text-lg">update</span>
+                Perbarui Data Guru
             </button>
         </div>
     </form>
@@ -315,7 +311,7 @@
 <div id="loading-spinner" class="fixed inset-0 bg-slate-900/20 backdrop-blur-[2px] z-[60] flex items-center justify-center hidden opacity-0 transition-all duration-300">
     <div class="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] shadow-2xl flex flex-col items-center gap-4">
         <div class="w-16 h-16 border-4 border-primary/10 border-t-primary rounded-full animate-spin"></div>
-        <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Mengunggah Data...</span>
+        <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Memproses Perubahan...</span>
     </div>
 </div>
 @endsection
@@ -357,7 +353,8 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             kelompokContainer.classList.add('hidden');
             kelompokSelect.required = false;
-            kelompokSelect.value = '';
+            // Note: Don't clear value here on Edit page unless user explicitly changes position
+            // But if it's hidden, it won't be required.
         }
     }
     

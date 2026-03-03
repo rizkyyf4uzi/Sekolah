@@ -1,181 +1,139 @@
 @if(isset($gurus) && $gurus->count() > 0)
-<table class="min-w-full divide-y divide-gray-200">
-    <thead class="bg-gray-50">
-        <tr>
-            <!-- Kolom untuk desktop/tablet -->
-            <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap hidden sm:table-cell">
-                No
-            </th>
-            <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                <div class="flex items-center">
-                    <span class="hidden sm:inline">Nama Guru</span>
-                    <span class="sm:hidden">Guru</span>
-                </div>
-            </th>
-            <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap hidden md:table-cell">
-                NIP
-            </th>
-            <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                <span class="hidden sm:inline">Jabatan</span>
-                <span class="sm:hidden">Jab</span>
-            </th>
-            <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap hidden lg:table-cell">
-                Kelompok
-            </th>
-            <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap hidden lg:table-cell">
-                Email
-            </th>
-            <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                Aksi
-            </th>
-        </tr>
-    </thead>
-    <tbody class="bg-white divide-y divide-gray-200">
-        @foreach($gurus as $index => $guru)
-        <tr class="hover:bg-gray-50 transition-colors duration-150">
-            <!-- No - Hidden di Mobile -->
-            <td class="px-4 sm:px-6 py-3 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">
-                {{ ($gurus->currentPage() - 1) * $gurus->perPage() + $index + 1 }}
-            </td>
-            
-            <!-- Nama Guru -->
-            <td class="px-4 sm:px-6 py-3 whitespace-nowrap">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-green-100 to-green-50 rounded-full flex items-center justify-center">
-                        <span class="text-green-600 font-bold text-xs sm:text-sm">
+<div class="overflow-x-auto no-scrollbar">
+    <table class="min-w-full divide-y divide-slate-100 dark:divide-slate-700/50">
+        <thead class="bg-slate-50/50 dark:bg-slate-900/50">
+            <tr>
+                <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] hidden sm:table-cell">No</th>
+                <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Info Guru</th>
+                <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] hidden md:table-cell">NIP</th>
+                <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Jabatan</th>
+                <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] hidden lg:table-cell">Kelompok</th>
+                <th class="px-6 py-4 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Aksi</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white dark:bg-slate-800 divide-y divide-slate-50 dark:divide-slate-700/50">
+            @foreach($gurus as $index => $guru)
+            <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors group">
+                <td class="px-6 py-4 whitespace-nowrap text-xs font-bold text-slate-400 hidden sm:table-cell">
+                    {{ ($gurus->currentPage() - 1) * $gurus->perPage() + $index + 1 }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-black text-sm shadow-sm">
                             {{ strtoupper(substr($guru->nama, 0, 1)) }}
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-sm font-black text-slate-900 dark:text-white tracking-tight">{{ $guru->nama }}</span>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ $guru->email ?: 'No Email' }}</span>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap hidden md:table-cell">
+                    <span class="px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 text-[10px] font-black tracking-widest font-mono">
+                        {{ $guru->nip ?: 'N/A' }}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    @if($guru->jabatan == 'guru')
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-widest">
+                            <span class="material-symbols-outlined text-sm">school</span>
+                            Guru
                         </span>
+                    @else
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase tracking-widest">
+                            <span class="material-symbols-outlined text-sm">badge</span>
+                            Staff
+                        </span>
+                    @endif
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap hidden lg:table-cell">
+                    @if($guru->jabatan == 'guru' && $guru->kelompok)
+                        <span class="px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 text-[10px] font-black uppercase tracking-widest">
+                            Kelompok {{ $guru->kelompok }}
+                        </span>
+                    @else
+                        <span class="text-slate-300 dark:text-slate-600">--</span>
+                    @endif
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right h-full">
+                    <div class="flex items-center justify-end gap-2">
+                        <a href="{{ route('admin.guru.show', $guru->id) }}" 
+                           class="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
+                           title="Detail">
+                            <span class="material-symbols-outlined text-lg">visibility</span>
+                        </a>
+                        <a href="{{ route('admin.guru.edit', $guru->id) }}" 
+                           class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
+                           title="Edit">
+                            <span class="material-symbols-outlined text-lg">edit</span>
+                        </a>
+                        <form action="{{ route('admin.guru.destroy', $guru->id) }}" method="POST" class="inline" id="delete-form-{{ $guru->id }}">
+                            @csrf
+                            @method('DELETE')
+                            <button type="button" onclick="confirmDeleteGuru({{ $guru->id }}, '{{ $guru->nama }}')"
+                                    class="w-9 h-9 rounded-xl bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 flex items-center justify-center hover:bg-rose-600 hover:text-white transition-all shadow-sm"
+                                    title="Hapus">
+                                <span class="material-symbols-outlined text-lg">delete</span>
+                            </button>
+                        </form>
                     </div>
-                    <div class="ml-3 min-w-0">
-                        <div class="text-sm font-medium text-gray-900 truncate max-w-[120px] sm:max-w-[180px] md:max-w-none">
-                            {{ $guru->nama }}
-                        </div>
-                        <div class="text-xs text-gray-500 sm:hidden">
-                            NIP: {{ $guru->nip ?: '-' }}
-                        </div>
-                        @if($guru->jabatan == 'guru' && $guru->kelompok)
-                        <div class="text-xs text-blue-600 sm:hidden mt-1">
-                            Kel. {{ $guru->kelompok }}
-                        </div>
-                        @endif
-                    </div>
-                </div>
-            </td>
-            
-            <!-- NIP - Hidden di Mobile -->
-            <td class="px-4 sm:px-6 py-3 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
-                <div class="truncate max-w-[120px]">
-                    {{ $guru->nip ?: '-' }}
-                </div>
-            </td>
-            
-            <!-- Jabatan -->
-            <td class="px-4 sm:px-6 py-3 whitespace-nowrap">
-                @if($guru->jabatan == 'guru')
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        <i class="fas fa-chalkboard-teacher mr-1 text-xs"></i>
-                        <span class="hidden sm:inline">Guru</span>
-                        <span class="sm:hidden">G</span>
-                    </span>
-                @else
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                        <i class="fas fa-user-tie mr-1 text-xs"></i>
-                        <span class="hidden sm:inline">Staff</span>
-                        <span class="sm:hidden">S</span>
-                    </span>
-                @endif
-            </td>
-            
-            <!-- Kelompok - Hidden di Tablet -->
-            <td class="px-4 sm:px-6 py-3 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
-                @if($guru->jabatan == 'guru' && $guru->kelompok)
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium 
-                        {{ $guru->kelompok == 'A' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' }}">
-                        Kelompok {{ $guru->kelompok }}
-                    </span>
-                @else
-                    <span class="text-gray-400 text-xs">-</span>
-                @endif
-            </td>
-            
-            <!-- Email - Hidden di Tablet -->
-            <td class="px-4 sm:px-6 py-3 text-sm text-gray-900 hidden lg:table-cell">
-                <div class="truncate max-w-[180px] xl:max-w-[220px]">
-                    {{ $guru->email ?: '-' }}
-                </div>
-            </td>
-            
-            <!-- Aksi -->
-            <td class="px-4 sm:px-6 py-3 whitespace-nowrap text-sm font-medium">
-                <div class="flex items-center space-x-1 sm:space-x-2">
-                    <a href="{{ route('admin.guru.show', $guru->id) }}" 
-                       class="text-blue-600 hover:text-blue-900 p-1 sm:p-2 hover:bg-blue-50 rounded transition-colors duration-150"
-                       title="Detail">
-                        <i class="fas fa-eye text-xs sm:text-sm"></i>
-                    </a>
-                    <a href="{{ route('admin.guru.edit', $guru->id) }}" 
-                       class="text-green-600 hover:text-green-900 p-1 sm:p-2 hover:bg-green-50 rounded transition-colors duration-150"
-                       title="Edit">
-                        <i class="fas fa-edit text-xs sm:text-sm"></i>
-                    </a>
-                    <form action="{{ route('admin.guru.destroy', $guru->id) }}" method="POST" class="inline" onsubmit="return confirmDelete(event)">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" 
-                                class="text-red-600 hover:text-red-900 p-1 sm:p-2 hover:bg-red-50 rounded transition-colors duration-150"
-                                title="Hapus">
-                            <i class="fas fa-trash text-xs sm:text-sm"></i>
-                        </button>
-                    </form>
-                </div>
-            </td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
 @else
-<!-- Empty State -->
-<div class="text-center py-12 px-4">
-    <div class="mx-auto w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-        <i class="fas fa-chalkboard-teacher text-gray-400 text-xl sm:text-2xl"></i>
+<div class="flex flex-col items-center justify-center py-20 px-4 text-center">
+    <div class="w-24 h-24 rounded-[2.5rem] bg-slate-50 dark:bg-slate-900/50 flex items-center justify-center text-slate-200 dark:text-slate-700 mb-6">
+        <span class="material-symbols-outlined text-5xl">person_off</span>
     </div>
-    <h3 class="text-lg font-medium text-gray-900 mb-2">Tidak ada data guru</h3>
-    <p class="text-gray-500 text-sm sm:text-base max-w-md mx-auto">
+    <h3 class="text-xl font-black text-slate-900 dark:text-white tracking-tight mb-2">Tidak ada data guru</h3>
+    <p class="text-sm text-slate-400 font-bold uppercase tracking-widest max-w-sm">
         @if(isset($search) && !empty($search))
             Tidak ditemukan guru dengan pencarian "{{ $search }}"
         @else
-            Belum ada guru yang terdaftar. Mulai dengan menambahkan guru baru.
+            Belum ada guru yang terdaftar dalam sistem.
         @endif
     </p>
-    <div class="mt-6">
+    <div class="mt-8 flex flex-wrap justify-center gap-3">
         <a href="{{ route('admin.guru.create') }}" 
-           class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-150">
-            <i class="fas fa-plus mr-2"></i> Tambah Guru Pertama
+           class="px-6 py-4 rounded-2xl bg-primary text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-105 transition-all active:scale-95 flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">add</span> Tambah Guru Pertama
         </a>
         @if(isset($search) && !empty($search))
-        <button onclick="window.location.href='{{ route('admin.guru.index') }}'" 
-                class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors duration-150 ml-3">
-            <i class="fas fa-redo mr-2"></i> Reset Pencarian
-        </button>
+        <a href="{{ route('admin.guru.index') }}" 
+           class="px-6 py-4 rounded-2xl bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-black text-xs uppercase tracking-widest border border-slate-200 dark:border-slate-600 shadow-sm hover:bg-slate-50 transition-all flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">refresh</span> Reset Pencarian
+        </a>
         @endif
     </div>
 </div>
 @endif
 
 <script>
-function confirmDelete(event) {
-    event.preventDefault();
-    if (window.innerWidth < 640) {
-        // Mobile confirmation
-        if (confirm('Hapus data guru ini?')) {
-            event.target.closest('form').submit();
+function confirmDeleteGuru(id, name) {
+    Swal.fire({
+        title: 'Hapus Data Guru?',
+        html: `Apakah Anda yakin ingin menghapus data guru <b>${name}</b>?<br><small class="text-rose-500 font-bold uppercase mt-2 block tracking-widest">Tindakan ini tidak dapat dibatalkan!</small>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#e11d48',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'YA, HAPUS DATA',
+        cancelButtonText: 'BATALKAN',
+        background: document.documentElement.classList.contains('dark') ? '#0f172a' : '#ffffff',
+        color: document.documentElement.classList.contains('dark') ? '#f8fafc' : '#0f172a',
+        customClass: {
+            popup: 'rounded-[2.5rem] border-none shadow-2xl p-8',
+            confirmButton: 'rounded-2xl px-8 py-4 font-black text-[10px] tracking-[0.2em]',
+            cancelButton: 'rounded-2xl px-8 py-4 font-black text-[10px] tracking-[0.2em] bg-slate-100 text-slate-600',
+            title: 'text-2xl font-black'
         }
-    } else {
-        // Desktop confirmation
-        if (confirm('Yakin ingin menghapus data guru ini?')) {
-            event.target.closest('form').submit();
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('delete-form-' + id).submit();
         }
-    }
-    return false;
+    });
 }
 </script>

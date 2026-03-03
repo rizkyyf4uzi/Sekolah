@@ -8,7 +8,8 @@ use App\Models\Guru;
 use App\Models\User;
 use App\Models\Spmb;
 use App\Models\TahunAjaran;
-use App\Models\BukuTamu; // Tambahkan import BukuTamu
+use App\Models\BukuTamu;
+use App\Models\Absensi;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -89,7 +90,38 @@ class DashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
-        
+
+        // Statistik untuk kartu dashboard
+        $siswa_aktif = Siswa::aktif()->count();
+        $siswa_lulus = Siswa::where('status_siswa', 'lulus')->count();
+        $kelompok_a = Siswa::aktif()->where('kelompok', 'A')->count();
+        $kelompok_b = Siswa::aktif()->where('kelompok', 'B')->count();
+        $laki_laki = Siswa::aktif()->where('jenis_kelamin', 'Laki-laki')->count();
+        $perempuan = Siswa::aktif()->where('jenis_kelamin', 'Perempuan')->count();
+        $absensi_hari_ini = Absensi::whereDate('tanggal', today())->count();
+        $persen_absen = $total_siswa > 0
+            ? round(min(100, ($absensi_hari_ini / $total_siswa) * 100), 1)
+            : 0;
+
+        $stats = [
+            'siswa_aktif' => $siswa_aktif,
+            'siswa_lulus' => $siswa_lulus,
+            'total_siswa' => $total_siswa,
+            'total_guru' => $total_guru,
+            'total_admin' => $total_admin,
+            'pendaftaran_baru' => $pendaftaran_baru,
+            'kelompok_a' => $kelompok_a,
+            'kelompok_b' => $kelompok_b,
+            'laki_laki' => $laki_laki,
+            'perempuan' => $perempuan,
+            'spmb_menunggu' => $spmb_statistics['menunggu'] ?? 0,
+            'spmb_diterima' => $spmb_statistics['diterima'] ?? 0,
+            'spmb_mundur' => $spmb_statistics['mundur'] ?? 0,
+            'ppdb_total' => $spmb_statistics['total'] ?? 0,
+            'absensi_hari_ini' => $absensi_hari_ini,
+            'persen_absen' => $persen_absen,
+        ];
+
         return view('admin.dashboard', compact(
             'total_siswa',
             'total_guru',
@@ -103,7 +135,8 @@ class DashboardController extends Controller
             'grafik_bulanan',
             'siswa_per_kelompok',
             'siswa_terbaru',
-            'tahunAjaranAktif'
+            'tahunAjaranAktif',
+            'stats'
         ));
     }
     

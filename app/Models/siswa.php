@@ -12,7 +12,6 @@ class Siswa extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'siswas';
-
     protected $fillable = [
         // Relasi
         'spmb_id',
@@ -30,8 +29,12 @@ class Siswa extends Model
         'jenis_kelamin',
         'agama',
         'foto',
+        'anak_ke',
+        'bahasa_sehari_hari',
+        'tinggal_bersama',
+        'status_tempat_tinggal',
         
-        // Alamat
+        // Alamat domisili
         'alamat',
         'provinsi',
         'kota_kabupaten',
@@ -39,9 +42,19 @@ class Siswa extends Model
         'kelurahan',
         'nama_jalan',
         
+        // Alamat KK (jika berbeda)
+        'provinsi_kk',
+        'kota_kabupaten_kk',
+        'kecamatan_kk',
+        'kelurahan_kk',
+        'nama_jalan_kk',
+        'alamat_kk',
+        
         // Data kesehatan
         'berat_badan',
         'tinggi_badan',
+        'jarak_rumah_ke_sekolah',
+        'waktu_tempuh_ke_sekolah',
         'golongan_darah',
         'penyakit_pernah_diderita',
         'imunisasi',
@@ -53,8 +66,7 @@ class Siswa extends Model
         'tanggal_lahir_ayah',
         'pendidikan_ayah',
         'pekerjaan_ayah',
-        'bidang_pekerjaan_ayah',
-        'penghasilan_ayah',
+        'penghasilan_per_bulan_ayah',
         
         // Data ibu
         'nama_ibu',
@@ -63,22 +75,23 @@ class Siswa extends Model
         'tanggal_lahir_ibu',
         'pendidikan_ibu',
         'pekerjaan_ibu',
-        'bidang_pekerjaan_ibu',
-        'penghasilan_ibu',
+        'penghasilan_per_bulan_ibu',
         
         // Data wali
         'punya_wali',
         'nama_wali',
-        'hubungan_wali',
         'nik_wali',
         'pekerjaan_wali',
         'nomor_telepon_wali',
+        'tempat_lahir_wali',
+        'tanggal_lahir_wali',
+        'pendidikan_wali',
+        'email_wali',
+        'hubungan_dengan_anak',
         
         // Kontak
-        'no_hp_ayah',
-        'email_ayah',
-        'no_hp_ibu',
-        'email_ibu',
+        'nomor_telepon_ayah',
+        'nomor_telepon_ibu',
         'no_hp_ortu',
         'email_ortu',
         
@@ -90,6 +103,9 @@ class Siswa extends Model
         'tanggal_masuk',
         'tanggal_keluar',
         'jalur_masuk',
+        'jenis_daftar',
+        'sumber_informasi_ppdb',
+        'punya_saudara_sekolah_tk',
         
         // Informasi kelas
         'kelas',
@@ -103,6 +119,7 @@ class Siswa extends Model
         'tanggal_lahir' => 'date',
         'tanggal_lahir_ayah' => 'date',
         'tanggal_lahir_ibu' => 'date',
+        'tanggal_lahir_wali' => 'date',
         'tanggal_masuk' => 'date',
         'tanggal_keluar' => 'date',
         'punya_wali' => 'boolean',

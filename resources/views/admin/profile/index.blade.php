@@ -1,6 +1,5 @@
 @extends('layouts.admin')
 
-@section('title', 'Profile Saya')
 @section('breadcrumb', 'Profile')
 
 @push('styles')
