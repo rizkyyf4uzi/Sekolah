@@ -8,46 +8,9 @@ use Illuminate\Http\Request;
 
 class BukuTamuController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $query = BukuTamu::latest();
-        
-        // Search
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")
-                  ->orWhere('instansi', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('telepon', 'like', "%{$search}%");
-            });
-        }
-        
-        // Filter status
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-        
-        // Filter tanggal
-        if ($request->filled('tanggal')) {
-            $query->whereDate('tanggal_kunjungan', $request->tanggal);
-        }
-        
-        // Filter verified
-        if ($request->filled('verified')) {
-            $query->where('is_verified', $request->verified == 'yes');
-        }
-        
-        $bukutamu = $query->paginate(20);
-        
-        $stats = [
-            'total' => BukuTamu::count(),
-            'today' => BukuTamu::today()->count(),
-            'pending' => BukuTamu::where('status', 'pending')->count(),
-            'verified' => BukuTamu::where('is_verified', true)->count(),
-        ];
-        
-        return view('admin.bukutamu.index', compact('bukutamu', 'stats'));
+        return view('admin.bukutamu.index');
     }
 
     public function show(BukuTamu $bukutamu)
@@ -62,12 +25,20 @@ class BukuTamuController extends Controller
 
     public function store(Request $request)
     {
+        if ($request->has('waktu_kunjungan')) {
+            $dt = \Carbon\Carbon::parse($request->waktu_kunjungan);
+            $request->merge([
+                'tanggal_kunjungan' => $dt->toDateString(),
+                'jam_kunjungan' => $dt->format('H:i'),
+            ]);
+        }
+
         $validated = $request->validate([
             'nama' => 'required|string|max:100',
             'instansi' => 'required|string|max:100',
             'jabatan' => 'nullable|string|max:100',
             'email' => 'nullable|email|max:100',
-            'telepon' => 'nullable|string|max:20',
+            'telepon' => 'required|string|max:20',
             'tanggal_kunjungan' => 'required|date',
             'jam_kunjungan' => 'required|date_format:H:i',
             'tujuan_kunjungan' => 'required|string|max:500',
@@ -92,12 +63,20 @@ class BukuTamuController extends Controller
 
     public function update(Request $request, BukuTamu $bukutamu)
     {
+        if ($request->has('waktu_kunjungan')) {
+            $dt = \Carbon\Carbon::parse($request->waktu_kunjungan);
+            $request->merge([
+                'tanggal_kunjungan' => $dt->toDateString(),
+                'jam_kunjungan' => $dt->format('H:i'),
+            ]);
+        }
+
         $validated = $request->validate([
             'nama' => 'required|string|max:100',
             'instansi' => 'required|string|max:100',
             'jabatan' => 'nullable|string|max:100',
             'email' => 'nullable|email|max:100',
-            'telepon' => 'nullable|string|max:20',
+            'telepon' => 'required|string|max:20',
             'tanggal_kunjungan' => 'required|date',
             'jam_kunjungan' => 'required|date_format:H:i',
             'tujuan_kunjungan' => 'required|string|max:500',

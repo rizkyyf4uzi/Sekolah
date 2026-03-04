@@ -253,6 +253,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'admin']
     Route::post('galeri/bulk-delete', [AdminGaleriController::class, 'bulkDelete'])->name('galeri.bulk-delete');
     Route::delete('galeri/gambar/{id}', [AdminGaleriController::class, 'destroyGambar'])->name('galeri.gambar.destroy');
     Route::post('galeri/{galeri}/update-urutan', [AdminGaleriController::class, 'updateUrutan'])->name('galeri.update-urutan');
+    
+    // Kegiatan Sekolah
+    Route::resource('kegiatan', App\Http\Controllers\Admin\KegiatanController::class);
+    Route::patch('kegiatan/{kegiatan}/toggle-publish', [App\Http\Controllers\Admin\KegiatanController::class, 'togglePublish'])->name('kegiatan.toggle-publish');
 
     // Buku Tamu Management
     Route::resource('bukutamu', AdminBukuTamuController::class);

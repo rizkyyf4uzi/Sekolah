@@ -12,34 +12,9 @@ use Illuminate\Support\Str;
 
 class GaleriController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $query = Galeri::with(['user', 'gambar'])->latest();
-        
-        // Search
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('judul', 'like', "%{$search}%")
-                  ->orWhere('deskripsi', 'like', "%{$search}%")
-                  ->orWhere('kategori', 'like', "%{$search}%");
-            });
-        }
-        
-        // Filter kategori
-        if ($request->filled('kategori')) {
-            $query->where('kategori', $request->kategori);
-        }
-        
-        // Filter status
-        if ($request->filled('status')) {
-            $query->where('is_published', $request->status == 'published');
-        }
-        
-        $galeri = $query->paginate(20);
-        $kategoriList = Galeri::select('kategori')->distinct()->pluck('kategori');
-        
-        return view('admin.galeri.index', compact('galeri', 'kategoriList'));
+        return view('admin.galeri.index');
     }
 
     public function create()
@@ -49,64 +24,79 @@ class GaleriController extends Controller
 
     public function store(Request $request)
     {
+        // Untuk AJAX (fetch dari JS), validasi error otomatis return JSON 422
         $validated = $request->validate([
-            'judul' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
-            'kategori' => 'required|string|max:100',
-            'gambar.*' => 'required|image|mimes:jpg,jpeg,png,gif|max:5120',
-            'tanggal' => 'required|date',
-            'lokasi' => 'nullable|string|max:255',
-            'is_published' => 'boolean'
+            'judul'        => 'required|string|max:255',
+            'deskripsi'    => 'nullable|string',
+            'kategori'     => 'required|string|max:100',
+            'tanggal'      => 'required|date',
+            'lokasi'       => 'nullable|string|max:255',
+            'is_published' => 'boolean',
+            'gambar'       => 'required|array|min:1',
+            'gambar.*'     => 'image|mimes:jpg,jpeg,png,gif|max:5120',
         ]);
 
-        // Gunakan DB transaction untuk keamanan data
         DB::beginTransaction();
-        
+
         try {
-            // Buat record galeri
             $galeri = Galeri::create([
-                'judul' => $request->judul,
-                'deskripsi' => $request->deskripsi,
-                'kategori' => $request->kategori,
-                'tanggal' => $request->tanggal,
-                'lokasi' => $request->lokasi ?? 'TK Harapan Bangsa 1', // Default value
-                'user_id' => auth()->id(),
-                'is_published' => $request->boolean('is_published')
+                'judul'        => $request->judul,
+                'deskripsi'    => $request->deskripsi,
+                'kategori'     => $request->kategori,
+                'tanggal'      => $request->tanggal,
+                'lokasi'       => $request->lokasi ?? 'TK Harapan Bangsa 1',
+                'user_id'      => auth()->id(),
+                'is_published' => $request->boolean('is_published'),
             ]);
 
-            // Upload multiple gambar
             if ($request->hasFile('gambar')) {
                 foreach ($request->file('gambar') as $index => $file) {
-                    // Generate nama file yang unik
                     $fileName = time() . '_' . $index . '_' . $file->getClientOriginalName();
-                    $path = $file->storeAs('galeri', $fileName, 'public');
-                    
+                    $path     = $file->storeAs('galeri', $fileName, 'public');
+
                     $galeri->gambar()->create([
-                        'path' => $path,
-                        'nama_file' => $file->getClientOriginalName(),
-                        'nama_file_asli' => $fileName, // Simpan nama file yang tersimpan
-                        'ukuran' => $file->getSize(),
-                        'mime_type' => $file->getMimeType(),
-                        'urutan' => $index
+                        'path'           => $path,
+                        'nama_file'      => $file->getClientOriginalName(),
+                        'nama_file_asli' => $fileName,
+                        'ukuran'         => $file->getSize(),
+                        'mime_type'      => $file->getMimeType(),
+                        'urutan'         => $index,
                     ]);
                 }
             }
-            
+
             DB::commit();
-            
-            return redirect()->route('admin.galeri.index')
-                ->with('success', 'Galeri berhasil ditambahkan dengan ' . $galeri->gambar->count() . ' gambar!');
-                
+
+            $successMsg = 'Galeri berhasil ditambahkan dengan ' . $galeri->gambar->count() . ' gambar!';
+
+            // Jika request dari fetch (AJAX), return JSON
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success'  => true,
+                    'message'  => $successMsg,
+                    'redirect' => route('admin.galeri.index'),
+                ]);
+            }
+
+            return redirect()->route('admin.galeri.index')->with('success', $successMsg);
+
         } catch (\Exception $e) {
             DB::rollback();
-            
-            // Hapus file yang sudah terupload jika terjadi error
+
             if ($request->hasFile('gambar')) {
                 foreach ($request->file('gambar') as $file) {
                     Storage::disk('public')->delete('galeri/' . $file->hashName());
                 }
             }
-            
+
+            // Jika request dari fetch (AJAX), return JSON error
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+                ], 500);
+            }
+
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());

@@ -17,6 +17,7 @@ class GambarGaleri extends Model
         'galeri_id',
         'path',
         'nama_file',
+        'nama_file_asli',
         'ukuran',
         'urutan',
         'caption',

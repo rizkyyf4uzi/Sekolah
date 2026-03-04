@@ -5,97 +5,97 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Kegiatan;
 use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\Storage;
 
 class KegiatanController extends Controller
 {
     public function index()
     {
-        $kegiatan = Kegiatan::latest()->get();
-        return view('admin.kegiatan.index', compact('kegiatan'));
+        return view('admin.kegiatan.index');
     }
-    
+
     public function create()
     {
-        $kategori = ['Outdoor Activity', 'Art Performance', 'Academic', 'Sports', 'Culture', 'Other'];
-        return view('admin.kegiatan.create', compact('kategori'));
+        return view('admin.kegiatan.create');
     }
-    
+
     public function store(Request $request)
     {
-        $request->validate([
-            'judul' => 'required',
-            'deskripsi' => 'required',
-            'tanggal' => 'required',
-            'kategori' => 'required',
-            'foto' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
+        $validated = $request->validate([
+            'nama_kegiatan'   => 'required|string|max:255',
+            'tanggal_mulai'   => 'required|date',
+            'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
+            'waktu_mulai'     => 'nullable',
+            'waktu_selesai'   => 'nullable',
+            'lokasi'          => 'required|string|max:255',
+            'kategori'        => 'required|string|max:100',
+            'deskripsi'       => 'nullable|string',
+            'banner'          => 'nullable|image|max:5120',
+            'is_published'    => 'boolean'
         ]);
-        
-        $kegiatan = new Kegiatan();
-        $kegiatan->judul = $request->judul;
-        $kegiatan->deskripsi = $request->deskripsi;
-        $kegiatan->tanggal = $request->tanggal;
-        $kegiatan->kategori = $request->kategori;
-        
-        if ($request->hasFile('foto')) {
-            $path = $request->file('foto')->store('kegiatan', 'public');
-            $kegiatan->foto = $path;
+
+        if ($request->hasFile('banner')) {
+            $validated['banner_path'] = $request->file('banner')->store('kegiatan', 'public');
         }
-        
-        $kegiatan->save();
-        
-        return redirect()->route('admin.kegiatan.index')->with('success', 'Kegiatan berhasil ditambahkan');
+
+        Kegiatan::create($validated);
+
+        return redirect()->route('admin.kegiatan.index')
+            ->with('success', 'Kegiatan berhasil ditambahkan!');
     }
-    
-    public function edit($id)
+
+    public function show(Kegiatan $kegiatan)
     {
-        $kegiatan = Kegiatan::findOrFail($id);
-        $kategori = ['Outdoor Activity', 'Art Performance', 'Academic', 'Sports', 'Culture', 'Other'];
-        return view('admin.kegiatan.edit', compact('kegiatan', 'kategori'));
+        return view('admin.kegiatan.show', compact('kegiatan'));
     }
-    
-    public function update(Request $request, $id)
+
+    public function edit(Kegiatan $kegiatan)
     {
-        $request->validate([
-            'judul' => 'required',
-            'deskripsi' => 'required',
-            'tanggal' => 'required',
-            'kategori' => 'required',
-            'foto' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
+        return view('admin.kegiatan.edit', compact('kegiatan'));
+    }
+
+    public function update(Request $request, Kegiatan $kegiatan)
+    {
+        $validated = $request->validate([
+            'nama_kegiatan'   => 'required|string|max:255',
+            'tanggal_mulai'   => 'required|date',
+            'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
+            'waktu_mulai'     => 'nullable',
+            'waktu_selesai'   => 'nullable',
+            'lokasi'          => 'required|string|max:255',
+            'kategori'        => 'required|string|max:100',
+            'deskripsi'       => 'nullable|string',
+            'banner'          => 'nullable|image|max:5120',
+            'is_published'    => 'boolean'
         ]);
-        
-        $kegiatan = Kegiatan::findOrFail($id);
-        $kegiatan->judul = $request->judul;
-        $kegiatan->deskripsi = $request->deskripsi;
-        $kegiatan->tanggal = $request->tanggal;
-        $kegiatan->kategori = $request->kategori;
-        
-        if ($request->hasFile('foto')) {
-            // Hapus foto lama jika ada
-            if ($kegiatan->foto && Storage::disk('public')->exists($kegiatan->foto)) {
-                Storage::disk('public')->delete($kegiatan->foto);
+
+        if ($request->hasFile('banner')) {
+            // Hapus yang lama
+            if ($kegiatan->banner_path) {
+                Storage::disk('public')->delete($kegiatan->banner_path);
             }
-            
-            $path = $request->file('foto')->store('kegiatan', 'public');
-            $kegiatan->foto = $path;
+            $validated['banner_path'] = $request->file('banner')->store('kegiatan', 'public');
         }
-        
-        $kegiatan->save();
-        
-        return redirect()->route('admin.kegiatan.index')->with('success', 'Kegiatan berhasil diperbarui');
+
+        $kegiatan->update($validated);
+
+        return redirect()->route('admin.kegiatan.index')
+            ->with('success', 'Kegiatan berhasil diperbarui!');
     }
-    
-    public function destroy($id)
+
+    public function destroy(Kegiatan $kegiatan)
     {
-        $kegiatan = Kegiatan::findOrFail($id);
-        
-        // Hapus foto jika ada
-        if ($kegiatan->foto && Storage::disk('public')->exists($kegiatan->foto)) {
-            Storage::disk('public')->delete($kegiatan->foto);
-        }
-        
         $kegiatan->delete();
-        
-        return redirect()->route('admin.kegiatan.index')->with('success', 'Kegiatan berhasil dihapus');
+
+        return redirect()->route('admin.kegiatan.index')
+            ->with('success', 'Kegiatan berhasil dihapus!');
+    }
+
+    public function togglePublish(Kegiatan $kegiatan)
+    {
+        $kegiatan->update(['is_published' => !$kegiatan->is_published]);
+
+        return back()->with('success', 'Status kegiatan berhasil diubah!');
     }
 }
