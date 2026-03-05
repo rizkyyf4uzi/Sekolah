@@ -135,7 +135,7 @@
             
             <!-- Share Button -->
             <button onclick="shareGallery()" 
-                    class="inline-flex items-center px-6 py-3 bg-white text-blue-600 rounded-xl hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-lg group">
+                    class="w-full lg:w-auto justify-center inline-flex items-center px-6 py-3 bg-white text-blue-600 rounded-xl hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-lg group mt-4 lg:mt-0">
                 <i class="fas fa-share-alt mr-2 group-hover:rotate-12 transition-transform"></i>
                 Bagikan Galeri
             </button>
@@ -447,9 +447,9 @@
         @endif
         
         <!-- Back Button -->
-        <div class="mt-12 text-center">
+        <div class="mt-12 text-center px-4 sm:px-0">
             <a href="{{ route('galeri.index') }}" 
-               class="inline-flex items-center px-8 py-4 bg-white border-2 border-blue-600 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all duration-300 transform hover:scale-105 font-semibold shadow-lg hover:shadow-xl">
+               class="w-full sm:w-auto justify-center inline-flex items-center px-8 py-4 bg-white border-2 border-blue-600 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all duration-300 transform hover:scale-105 font-semibold shadow-lg hover:shadow-xl">
                 <i class="fas fa-arrow-left mr-2"></i> 
                 Kembali ke Galeri
             </a>

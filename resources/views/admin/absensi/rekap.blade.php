@@ -19,13 +19,13 @@
 </nav>
 
 <!-- Header Section -->
-<div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6 mb-6 md:mb-8">
     <div>
-        <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Rekap Absensi</h1>
+        <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Rekap Absensi</h1>
         <p class="text-sm text-slate-500 mt-1 text-balance">Laporan komprehensif kehadiran siswa untuk analisis dan evaluasi.</p>
     </div>
-    <div class="flex items-center gap-3">
-        <a href="{{ route('admin.absensi.export', request()->query()) }}" class="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-2xl font-bold text-sm hover:bg-green-700 transition-all shadow-lg shadow-green-600/20">
+    <div class="flex items-center w-full md:w-auto mt-2 md:mt-0">
+        <a href="{{ route('admin.absensi.export', request()->query()) }}" class="flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-2xl font-bold text-sm hover:bg-green-700 transition-all shadow-lg shadow-green-600/20 w-full md:w-auto">
             <span class="material-symbols-outlined text-lg">file_download</span>
             Export Excel
         </a>
@@ -70,11 +70,11 @@
 
 <!-- Data Table -->
 <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
-    <div class="p-6 border-b border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="p-4 md:p-6 border-b border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <h2 class="text-xl font-bold text-slate-800">Data Rekapitulasi</h2>
         
-        <form action="{{ route('admin.absensi.rekap') }}" method="GET" class="flex items-center gap-3">
-            <div class="relative w-48">
+        <form action="{{ route('admin.absensi.rekap') }}" method="GET" class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+            <div class="relative w-full sm:w-48">
                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">group</span>
                 <select name="kelompok" class="w-full pl-9 pr-4 py-2 bg-slate-50 border-none rounded-xl text-xs font-bold" onchange="this.form.submit()">
                     <option value="">Semua Kelompok</option>
@@ -82,19 +82,21 @@
                     <option value="B" {{ request('kelompok') == 'B' ? 'selected' : '' }}>Kelompok B</option>
                 </select>
             </div>
-            <div class="relative w-48">
-                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">calendar_month</span>
-                <input type="month" name="bulan" value="{{ request('bulan') }}" class="w-full pl-9 pr-4 py-2 bg-slate-50 border-none rounded-xl text-xs font-bold" onchange="this.form.submit()">
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+                <div class="relative flex-1 sm:w-48">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">calendar_month</span>
+                    <input type="month" name="bulan" value="{{ request('bulan') }}" class="w-full pl-9 pr-4 py-2 bg-slate-50 border-none rounded-xl text-xs font-bold" onchange="this.form.submit()">
+                </div>
+                @if(request()->anyFilled(['kelompok', 'bulan']))
+                <a href="{{ route('admin.absensi.rekap') }}" class="p-2 text-slate-400 hover:text-red-500 transition-all shrink-0">
+                    <span class="material-symbols-outlined">restart_alt</span>
+                </a>
+                @endif
             </div>
-            @if(request()->anyFilled(['kelompok', 'bulan']))
-            <a href="{{ route('admin.absensi.rekap') }}" class="p-2 text-slate-400 hover:text-red-500 transition-all">
-                <span class="material-symbols-outlined">restart_alt</span>
-            </a>
-            @endif
         </form>
     </div>
 
-    <div class="overflow-x-auto">
+    <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="bg-slate-50/50 border-b border-slate-100">
@@ -162,6 +164,63 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+
+    <!-- Mobile Card View -->
+    <div class="md:hidden flex flex-col divide-y divide-slate-50">
+        @forelse($rekap_data as $index => $item)
+        <div class="p-4 transition-colors hover:bg-slate-50/30">
+            <div class="flex items-start justify-between gap-3 mb-3">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-primary font-bold text-sm shrink-0">
+                        {{ strtoupper(substr($item->siswa?->nama ?? '?', 0, 1)) }}
+                    </div>
+                    <div class="min-w-0 flex flex-col">
+                        <span class="text-sm font-bold text-slate-800 truncate">{{ $item->siswa?->nama ?? 'Tidak ditemukan' }}</span>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded border border-slate-200 text-[9px] font-bold text-slate-500 uppercase tracking-wider">
+                                {{ \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y') }}
+                            </span>
+                            <span class="inline-flex items-center text-[10px] font-bold 
+                                {{ ($item->siswa?->kelompok ?? '') == 'A' ? 'text-blue-600' : 
+                                (($item->siswa?->kelompok ?? '') == 'B' ? 'text-green-600' : 
+                                'text-slate-600') }}">
+                                Kel. {{ $item->siswa?->kelompok ?? '-' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    @if($item->status == 'hadir')
+                        <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-green-100 text-green-700">
+                            HADIR
+                        </span>
+                    @elseif($item->status == 'izin')
+                        <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-blue-100 text-blue-700">
+                            IZIN
+                        </span>
+                    @elseif($item->status == 'sakit')
+                        <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-amber-100 text-amber-700">
+                            SAKIT
+                        </span>
+                    @else
+                        <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-red-100 text-red-700">
+                            ALPA
+                        </span>
+                    @endif
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-between text-xs text-slate-500 bg-slate-50 p-2 rounded-lg ml-13">
+                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">person</span> Guru: {{ $item->guru->nama ?? '-' }}</span>
+            </div>
+        </div>
+        @empty
+        <div class="px-6 py-12 text-center text-slate-400">
+            <span class="material-symbols-outlined text-4xl mb-2">inventory_2</span>
+            <p class="text-sm">Belum ada data rekap absensi tersedia.</p>
+        </div>
+        @endforelse
     </div>
 
     @if($rekap_data->hasPages())

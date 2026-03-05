@@ -1,9 +1,9 @@
 <div>
     {{-- Toolbar: Search, Filter, Add --}}
-    <div class="bg-white rounded-2xl p-4 shadow-sm mb-8 flex flex-wrap items-center justify-between gap-4 border border-slate-100">
-        <div class="flex flex-wrap items-center gap-4 flex-1">
+    <div class="bg-white rounded-2xl p-4 shadow-sm mb-8 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 border border-slate-100">
+        <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-4 flex-1">
             {{-- Search --}}
-            <div class="relative flex-1 max-w-sm">
+            <div class="relative flex-1 min-w-[200px] w-full sm:w-auto">
                 <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
                 <input type="text"
                        wire:model.live.debounce.300ms="search"
@@ -13,7 +13,7 @@
 
             {{-- Kategori Filter --}}
             <select wire:model.live="kategori"
-                    class="border border-slate-200 rounded-xl px-4 py-2 text-sm bg-slate-50 focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all">
+                    class="w-full sm:w-auto border border-slate-200 rounded-xl px-4 py-2 text-sm bg-slate-50 focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all">
                 <option value="">Semua Kategori</option>
                 @foreach($kategoriList as $kat)
                     <option value="{{ $kat }}">
@@ -23,24 +23,24 @@
             </select>
 
             {{-- Status Filter --}}
-            <div class="flex items-center bg-slate-50 rounded-xl p-1">
+            <div class="flex items-center justify-center bg-slate-50 rounded-xl p-1 w-full sm:w-auto overflow-x-auto">
                 <button type="button" wire:click="$set('status', '')"
-                        class="px-4 py-1.5 text-sm font-medium rounded-lg transition-colors {{ $status === '' ? 'bg-white text-primary shadow-sm font-semibold' : 'text-slate-500 hover:text-primary' }}">
+                        class="px-4 py-1.5 text-sm font-medium rounded-lg transition-colors whitespace-nowrap {{ $status === '' ? 'bg-white text-primary shadow-sm font-semibold' : 'text-slate-500 hover:text-primary' }}">
                     Semua
                 </button>
                 <button type="button" wire:click="$set('status', 'published')"
-                        class="px-4 py-1.5 text-sm font-medium rounded-lg transition-colors {{ $status === 'published' ? 'bg-white text-primary shadow-sm font-semibold' : 'text-slate-500 hover:text-primary' }}">
+                        class="px-4 py-1.5 text-sm font-medium rounded-lg transition-colors whitespace-nowrap {{ $status === 'published' ? 'bg-white text-primary shadow-sm font-semibold' : 'text-slate-500 hover:text-primary' }}">
                     Published
                 </button>
                 <button type="button" wire:click="$set('status', 'draft')"
-                        class="px-4 py-1.5 text-sm font-medium rounded-lg transition-colors {{ $status === 'draft' ? 'bg-white text-primary shadow-sm font-semibold' : 'text-slate-500 hover:text-primary' }}">
+                        class="px-4 py-1.5 text-sm font-medium rounded-lg transition-colors whitespace-nowrap {{ $status === 'draft' ? 'bg-white text-primary shadow-sm font-semibold' : 'text-slate-500 hover:text-primary' }}">
                     Draft
                 </button>
             </div>
 
             @if($search || $kategori || $status)
                 <button type="button" wire:click="resetFilters"
-                   class="px-4 py-2 text-sm font-medium text-slate-500 hover:text-primary border border-slate-200 rounded-xl bg-slate-50 hover:bg-lavender transition-all">
+                   class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-slate-500 hover:text-primary border border-slate-200 rounded-xl bg-slate-50 hover:bg-lavender transition-all">
                     Reset
                 </button>
             @endif
@@ -48,7 +48,7 @@
 
         {{-- Add Button --}}
         <a href="{{ route('admin.galeri.create') }}"
-           class="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-bold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+           class="w-full md:w-auto flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-bold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 whitespace-nowrap">
             <span class="material-symbols-outlined text-lg">add_circle</span>
             Tambah Album
         </a>

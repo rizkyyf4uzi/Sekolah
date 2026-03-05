@@ -236,17 +236,22 @@
             </div>
             
             {{-- Action Buttons --}}
-            <div class="mt-8 flex justify-end space-x-3 border-t pt-6">
-                <a href="{{ route('admin.galeri.index') }}" 
-                   class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                    Batal
-                </a>
-                <button type="submit" 
-                        id="btnSubmit"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    Update Galeri
-                </button>
+            <div class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-slate-200 z-50 md:relative md:p-0 md:bg-transparent md:border-none md:z-auto md:mt-8 md:flex md:justify-end md:space-x-3 md:pt-6 md:border-t">
+                <div class="flex flex-col sm:flex-row md:flex-row gap-3">
+                    <button type="submit" 
+                            id="btnSubmit"
+                            class="w-full sm:w-auto px-6 py-3 md:py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 order-1 sm:order-2">
+                        Update Galeri
+                    </button>
+                    <a href="{{ route('admin.galeri.index') }}" 
+                       class="w-full sm:w-auto text-center px-6 py-3 md:py-2 border border-slate-300 text-slate-700 font-bold rounded-lg hover:bg-slate-50 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 order-2 sm:order-1">
+                        Batal
+                    </a>
+                </div>
             </div>
+            
+            {{-- Spacer for mobile sticky footer --}}
+            <div class="h-24 md:hidden"></div>
         </form>
     </div>
 </div>

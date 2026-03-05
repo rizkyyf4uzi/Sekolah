@@ -15,31 +15,7 @@
 <section class="py-12">
     <div class="container mx-auto px-4 max-w-4xl">
         <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-            <!-- Progress Steps -->
-            <div class="p-6 bg-gradient-to-r from-green-50 to-emerald-50 border-b">
-                <div class="flex items-center justify-between">
-                    <div class="text-center">
-                        <div class="w-10 h-10 bg-green-600 text-white rounded-full flex items-center justify-center mx-auto mb-2">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <p class="text-sm font-medium text-green-700">Data Pribadi</p>
-                    </div>
-                    <div class="flex-1 h-1 bg-green-200 mx-4"></div>
-                    <div class="text-center">
-                        <div class="w-10 h-10 bg-green-200 text-green-700 rounded-full flex items-center justify-center mx-auto mb-2">
-                            <i class="fas fa-calendar-alt"></i>
-                        </div>
-                        <p class="text-sm text-gray-500">Jadwal Kunjungan</p>
-                    </div>
-                    <div class="flex-1 h-1 bg-gray-200 mx-4"></div>
-                    <div class="text-center">
-                        <div class="w-10 h-10 bg-gray-200 text-gray-500 rounded-full flex items-center justify-center mx-auto mb-2">
-                            <i class="fas fa-check"></i>
-                        </div>
-                        <p class="text-sm text-gray-500">Konfirmasi</p>
-                    </div>
-                </div>
-            </div>
+
             
             <!-- Form -->
             <div class="p-6 md:p-8">
@@ -124,58 +100,8 @@
                         </div>
                     </div>
                     
-                    <!-- Jadwal Kunjungan -->
-                    <div class="mb-8">
-                        <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                            <i class="fas fa-calendar-alt text-green-600 mr-3"></i>
-                            Jadwal Kunjungan
-                        </h3>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Tanggal Kunjungan <span class="text-red-500">*</span>
-                                </label>
-                                <input type="date" 
-                                       name="tanggal_kunjungan" 
-                                       value="{{ old('tanggal_kunjungan', date('Y-m-d')) }}"
-                                       min="{{ date('Y-m-d') }}"
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                                       required>
-                                @error('tanggal_kunjungan')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Jam Kunjungan <span class="text-red-500">*</span>
-                                </label>
-                                <select name="jam_kunjungan" 
-                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                                        required>
-                                    <option value="">Pilih Jam</option>
-                                    @for($i = 8; $i <= 16; $i++)
-                                        @php
-                                            $time1 = sprintf('%02d:00', $i);
-                                            $time2 = sprintf('%02d:30', $i);
-                                        @endphp
-                                        <option value="{{ $time1 }}" {{ old('jam_kunjungan') == $time1 ? 'selected' : '' }}>
-                                            {{ $time1 }}
-                                        </option>
-                                        @if($i < 16)
-                                        <option value="{{ $time2 }}" {{ old('jam_kunjungan') == $time2 ? 'selected' : '' }}>
-                                            {{ $time2 }}
-                                        </option>
-                                        @endif
-                                    @endfor
-                                </select>
-                                @error('jam_kunjungan')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-                        </div>
-                    </div>
+                    <input type="hidden" name="tanggal_kunjungan" value="{{ date('Y-m-d') }}">
+                    <input type="hidden" name="jam_kunjungan" value="{{ date('H:i') }}">
                     
                     <!-- Tujuan & Pesan -->
                     <div class="mb-8">

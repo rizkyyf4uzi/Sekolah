@@ -57,7 +57,7 @@
 @if($kelompok && $siswa->isNotEmpty())
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
     <div>
-        <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Input Absensi - Kelompok {{ $kelompok }}</h1>
+        <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Input Absensi - Kel. {{ $kelompok }}</h1>
         <p class="text-sm text-slate-500 mt-1">Silakan isi kehadiran siswa untuk hari ini.</p>
     </div>
     <div class="flex items-center gap-4">
@@ -82,7 +82,8 @@
         <input type="hidden" name="guru_id" value="{{ $guru->id }}">
     @endif
 
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-20">
+    <!-- Desktop Table View -->
+    <div class="hidden md:block bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-20">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse min-w-[800px]">
                 <thead>
@@ -149,15 +150,59 @@
         </div>
     </div>
 
+    <!-- Mobile Card View -->
+    <div class="md:hidden flex flex-col gap-4 mb-24">
+        @foreach($siswa as $index => $s)
+        @php 
+            $existingStatus = optional($existing->get($s->id))->status ?? 'hadir'; 
+            $keterangan = optional($existing->get($s->id))->keterangan ?? '';
+            $colorClass = $colors[$index % count($colors)];
+            
+            // Get initials
+            $nameParts = explode(' ', $s->nama_lengkap ?? $s->nama);
+            $initials = '';
+            foreach(array_slice($nameParts, 0, 2) as $part) {
+                if(!empty($part)) $initials .= strtoupper(substr($part, 0, 1));
+            }
+            if(empty($initials)) $initials = '?';
+        @endphp
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-4 relative overflow-hidden">
+            <div class="flex items-center gap-3 border-b border-slate-50 pb-3">
+                <div class="w-10 h-10 rounded-full {{ $colorClass['bg'] }} {{ $colorClass['text'] }} flex items-center justify-center font-bold text-sm shrink-0">{{ $initials }}</div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-bold text-slate-800 truncate">{{ $s->nama_lengkap ?? $s->nama }}</p>
+                    <p class="text-xs text-slate-400 mt-0.5 font-medium">{{ $s->nis ?? 'No NIS' }}</p>
+                </div>
+            </div>
+            
+            <div class="flex flex-col gap-3">
+                <div class="w-full">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Status</label>
+                    <select name="statuses[{{ $s->id }}]" class="w-full px-4 py-3 bg-slate-50 border-none rounded-xl focus:ring-2 focus:ring-primary/20 text-sm font-bold cursor-pointer transition-all appearance-none text-slate-700">
+                        <option value="hadir" {{ $existingStatus == 'hadir' ? 'selected' : '' }}>Hadir</option>
+                        <option value="sakit" {{ $existingStatus == 'sakit' ? 'selected' : '' }}>Sakit</option>
+                        <option value="izin" {{ $existingStatus == 'izin' ? 'selected' : '' }}>Izin</option>
+                        <option value="alpa" {{ ($existingStatus == 'alpa' || str_contains($existingStatus, 'tidak_hadir')) ? 'selected' : '' }}>Alpa</option>
+                    </select>
+                </div>
+                <div class="w-full">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Catatan</label>
+                    <input class="w-full px-4 py-3 bg-slate-50 border-none rounded-xl focus:ring-2 focus:ring-primary/20 text-sm transition-all" name="keterangan[{{ $s->id }}]" placeholder="Keterangan opsional..." type="text" value="{{ $keterangan }}"/>
+                </div>
+            </div>
+        </div>
+        @endforeach
+    </div>
+
     <!-- Fixed Bottom Bar -->
     <div class="fixed bottom-0 right-0 left-0 lg:left-72 bg-white/80 backdrop-blur-md border-t border-slate-100 p-4 z-[40] shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] transition-all duration-300">
-        <div class="max-w-7xl mx-auto flex items-center justify-end gap-4 px-4">
-            <a href="{{ route('admin.absensi.index') }}" class="px-8 py-3 bg-slate-100 text-slate-600 rounded-2xl font-bold text-sm hover:bg-slate-200 transition-all hidden sm:inline-block">
+        <div class="max-w-7xl mx-auto flex items-center justify-end gap-3 px-2 md:px-4">
+            <a href="{{ route('admin.absensi.index') }}" class="px-6 py-3 bg-slate-100 text-slate-600 rounded-2xl font-bold text-sm hover:bg-slate-200 transition-all flex items-center justify-center flex-1 sm:flex-none">
                 Batal
             </a>
-            <button type="button" onclick="document.getElementById('form-absensi').submit();" class="px-10 py-3 bg-primary text-white rounded-2xl font-bold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 flex items-center gap-2">
+            <button type="button" onclick="document.getElementById('form-absensi').submit();" class="px-8 py-3 bg-primary text-white rounded-2xl font-bold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 flex items-center justify-center gap-2 flex-[2] sm:flex-none">
                 <span class="material-symbols-outlined text-lg">save</span>
-                Simpan Absensi
+                Simpan
             </button>
         </div>
     </div>

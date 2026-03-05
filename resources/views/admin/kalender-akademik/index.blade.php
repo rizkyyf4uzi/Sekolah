@@ -10,12 +10,23 @@
         grid-template-columns: repeat(7, 1fr);
     }
     .calendar-day {
-        min-height: 120px;
+        min-height: 140px; /* Taller on desktop for more premium feel */
+        transition: all 0.2s ease;
     }
-    @media (max-width: 640px) {
-        .calendar-day { min-height: 80px; }
+    .calendar-day:hover {
+        background-color: theme('colors.slate.50');
+    }
+    @media (max-width: 768px) {
+        .calendar-day { 
+            min-height: 70px; /* More compact on mobile */
+            padding: 0.25rem !important; /* Less padding on small screens */
+        }
+        .calendar-day:hover {
+            background-color: transparent; /* No hover effect on mobile */
+        }
         .event-label { display: none; }
-        .event-dot { display: block !important; }
+        .event-dot { display: block !important; margin: 0 auto; }
+        .calendar-grid-header { padding-top: 0.5rem; padding-bottom: 0.5rem; font-size: 0.6rem; }
     }
     [x-cloak] { display: none !important; }
 </style>
@@ -35,8 +46,8 @@
         <div>
             <p class="text-slate-500 text-sm mt-1">Kelola agenda kegiatan sekolah dan hari libur nasional (Masehi).</p>
         </div>
-        <div class="flex flex-wrap items-center gap-3">
-            <div class="flex items-center bg-white rounded-xl shadow-sm border border-slate-100 p-1 relative">
+        <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-between gap-3 w-full mt-4 md:mt-0">
+            <div class="flex items-center justify-between sm:justify-start gap-1 bg-white rounded-xl shadow-sm border border-slate-100 p-1 relative w-full sm:w-auto">
                 <a href="{{ route('admin.kalender-akademik.index', ['year' => $prevMonth->year, 'month' => $prevMonth->month]) }}" 
                    class="p-2 hover:bg-slate-50 rounded-lg text-slate-400 transition-colors">
                     <span class="material-symbols-outlined">chevron_left</span>
@@ -44,8 +55,8 @@
                 
                 <!-- Month Picker Toggle -->
                 <button @click="isMonthPickerOpen = !isMonthPickerOpen" 
-                        class="px-4 py-1.5 flex items-center gap-2 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer">
-                    <span class="font-bold text-slate-700">{{ $currentMonth->translatedFormat('F Y') }}</span>
+                        class="px-4 py-1.5 flex flex-1 sm:flex-none justify-center items-center gap-2 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer">
+                    <span class="font-bold text-slate-700 whitespace-nowrap">{{ $currentMonth->translatedFormat('F Y') }}</span>
                     <span class="material-symbols-outlined text-slate-400 text-sm transition-transform" :class="isMonthPickerOpen ? 'rotate-180' : ''">keyboard_arrow_down</span>
                 </button>
 
@@ -84,15 +95,17 @@
                     <span class="material-symbols-outlined">chevron_right</span>
                 </a>
             </div>
-            <a href="{{ route('admin.kalender-akademik.index') }}" 
-               class="px-4 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all">
-                Hari Ini
-            </a>
-            <button @click="openAddModal()"
-               class="px-5 py-2.5 bg-primary text-white rounded-xl font-bold text-sm shadow-lg shadow-primary/20 flex items-center gap-2 hover:bg-primary/90 transition-all">
-                <span class="material-symbols-outlined text-lg">add</span>
-                Tambah Agenda
-            </button>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+                <a href="{{ route('admin.kalender-akademik.index') }}" 
+                   class="w-full sm:w-auto text-center px-4 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all whitespace-nowrap">
+                    Hari Ini
+                </a>
+                <button @click="openAddModal()"
+                   class="w-full sm:w-auto justify-center px-5 py-2.5 bg-primary text-white rounded-xl font-bold text-sm shadow-lg shadow-primary/20 flex items-center gap-2 hover:bg-primary/90 transition-all whitespace-nowrap">
+                    <span class="material-symbols-outlined text-lg">add</span>
+                    Tambah Agenda
+                </button>
+            </div>
         </div>
     </div>
 
@@ -120,8 +133,22 @@
     <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
         <!-- ... existing grid code ... -->
         <div class="calendar-grid border-b border-slate-100 bg-slate-50/50">
-            @foreach(['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'] as $day)
-                <div class="py-4 text-center text-xs font-bold text-slate-400 uppercase tracking-widest">{{ $day }}</div>
+            @php
+                $days = [
+                    ['full' => 'Minggu', 'short' => 'Min'],
+                    ['full' => 'Senin', 'short' => 'Sen'],
+                    ['full' => 'Selasa', 'short' => 'Sel'],
+                    ['full' => 'Rabu', 'short' => 'Rab'],
+                    ['full' => 'Kamis', 'short' => 'Kam'],
+                    ['full' => 'Jumat', 'short' => 'Jum'],
+                    ['full' => 'Sabtu', 'short' => 'Sab'],
+                ];
+            @endphp
+            @foreach($days as $day)
+                <div class="calendar-grid-header py-2 md:py-4 text-center text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">
+                    <span class="hidden md:inline">{{ $day['full'] }}</span>
+                    <span class="md:hidden">{{ $day['short'] }}</span>
+                </div>
             @endforeach
         </div>
         
@@ -195,14 +222,14 @@
                         <div class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider {{ $classes['bg'] }} {{ $classes['text'] }}">
                             {{ $event->kategori }}
                         </div>
-                        <div class="flex gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button @click="openEditModal({{ json_encode($event) }})" class="p-1 text-slate-400 hover:text-primary transition-colors">
-                                <span class="material-symbols-outlined text-sm">edit</span>
+                        <div class="flex gap-2 md:gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button @click="openEditModal({{ json_encode($event) }})" class="p-1.5 md:p-1 text-slate-400 hover:text-primary transition-colors bg-slate-50 md:bg-transparent rounded-lg md:rounded-none">
+                                <span class="material-symbols-outlined text-[16px] md:text-sm">edit</span>
                             </button>
                             <form action="{{ route('admin.kalender-akademik.destroy', $event) }}" method="POST" onsubmit="return confirm('Hapus agenda ini?')">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="p-1 text-slate-400 hover:text-red-500 transition-colors">
-                                    <span class="material-symbols-outlined text-sm">delete</span>
+                                <button type="submit" class="p-1.5 md:p-1 text-slate-400 hover:text-red-500 transition-colors bg-slate-50 md:bg-transparent rounded-lg md:rounded-none">
+                                    <span class="material-symbols-outlined text-[16px] md:text-sm">delete</span>
                                 </button>
                             </form>
                         </div>
@@ -308,11 +335,11 @@
                         </div>
                     </div>
 
-                    <div class="p-6 border-t border-slate-100 flex items-center justify-end gap-3 bg-slate-50/50 mt-4 -mx-8 -mb-8">
-                        <button type="button" @click="closeModal()" class="px-6 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-200 rounded-xl transition-all">
+                    <div class="p-6 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-center justify-end gap-3 bg-slate-50/50 mt-4 -mx-8 -mb-8">
+                        <button type="button" @click="closeModal()" class="w-full sm:w-auto px-6 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-200 rounded-xl transition-all">
                             Batal
                         </button>
-                        <button type="submit" class="px-8 py-2.5 text-sm font-bold text-white bg-primary rounded-xl shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all flex items-center gap-2">
+                        <button type="submit" class="w-full sm:w-auto justify-center px-8 py-2.5 text-sm font-bold text-white bg-primary rounded-xl shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all flex items-center gap-2">
                             <span class="material-symbols-outlined text-lg">save</span>
                             <span x-text="isEdit ? 'Perbarui Agenda' : 'Simpan Agenda'"></span>
                         </button>

@@ -7,10 +7,10 @@
 @section('content')
 <div class="max-w-4xl mx-auto">
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        <div class="p-8">
-            <div class="flex items-start justify-between gap-4 mb-8">
+        <div class="p-6 md:p-8">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
                         <span class="material-symbols-outlined">calendar_add_on</span>
                     </div>
                     <div>
@@ -20,7 +20,7 @@
                 </div>
 
                 <a href="{{ route('admin.tahun-ajaran.index') }}"
-                   class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-slate-700 rounded-xl border border-slate-200 hover:bg-slate-50 transition-all font-bold text-sm shadow-sm">
+                   class="inline-flex w-full md:w-auto items-center justify-center gap-2 px-4 py-2.5 bg-white text-slate-700 rounded-xl border border-slate-200 hover:bg-slate-50 transition-all font-bold text-sm shadow-sm">
                     <span class="material-symbols-outlined text-xl">arrow_back</span>
                     Kembali
                 </a>

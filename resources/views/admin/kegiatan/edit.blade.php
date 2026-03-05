@@ -136,12 +136,15 @@
                     </div>
                 </div>
             </div>
-            <div class="bg-slate-50/50 px-8 py-6 flex items-center justify-end gap-4 border-t border-slate-100">
+            <!-- Spacer for sticky mobile buttons -->
+            <div class="h-24 md:hidden"></div>
+
+            <div class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg px-6 py-4 flex items-center justify-between gap-4 border-t border-slate-100 md:relative md:bg-slate-50/50 md:px-8 md:py-6 md:justify-end md:gap-4 z-30">
                 <a href="{{ route('admin.kegiatan.index') }}" 
-                   class="px-8 py-3.5 text-slate-600 font-bold text-sm hover:bg-slate-100 rounded-2xl transition-all">
+                   class="flex-1 md:flex-none text-center px-8 py-3.5 text-slate-600 font-bold text-sm hover:bg-slate-100 rounded-2xl transition-all">
                     Batal
                 </a>
-                <button type="submit" class="px-8 py-3.5 bg-primary text-white rounded-2xl font-bold text-sm hover:opacity-90 transition-all shadow-lg shadow-primary/20 flex items-center gap-2">
+                <button type="submit" class="flex-1 md:flex-none px-8 py-3.5 bg-primary text-white rounded-2xl font-bold text-sm hover:opacity-90 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
                     <span class="material-symbols-outlined text-lg">save</span>
                     Simpan Perubahan
                 </button>

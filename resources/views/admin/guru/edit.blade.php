@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Edit Data Guru - SchoolAdmin Pro')
+@section('title', 'Edit Data Guru - SchoolAdmin&nbsp;Pro')
 
 @section('content')
 <div class="min-h-screen bg-background-light dark:bg-background-dark p-8 pb-8">

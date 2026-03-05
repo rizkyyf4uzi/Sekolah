@@ -34,7 +34,7 @@
     <!-- Gallery Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @foreach($galeri as $item)
-        <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-shadow">
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-shadow flex flex-col h-full">
             <div class="relative overflow-hidden h-48">
                 <a href="{{ route('galeri.show', $item->slug) }}">
                     <img src="{{ $item->thumbnail_url }}" 
@@ -61,7 +61,7 @@
                 @endif
             </div>
             
-            <div class="p-5">
+            <div class="p-5 flex-1 flex flex-col">
                 <div class="flex items-center text-sm text-gray-500 mb-2">
                     <i class="fas fa-calendar-alt mr-1"></i>
                     {{ $item->tanggal ? $item->tanggal->format('d M Y') : now()->format('d M Y') }}
@@ -77,13 +77,15 @@
                 </h3>
                 
                 @if($item->deskripsi)
-                <div class="text-gray-600 mb-4 line-clamp-2 text-sm">
+                <div class="text-gray-600 mb-4 line-clamp-2 text-sm flex-1">
                     {{ Str::limit(strip_tags($item->deskripsi), 80) }}
                 </div>
+                @else
+                <div class="flex-1"></div>
                 @endif
                 
                 <a href="{{ route('galeri.show', $item->slug) }}"
-                   class="inline-flex items-center text-orange-600 hover:text-orange-800 font-medium text-sm">
+                   class="inline-flex items-center text-orange-600 hover:text-orange-800 font-medium text-sm mt-auto w-fit">
                     Lihat Detail
                     <i class="fas fa-arrow-right ml-2"></i>
                 </a>

@@ -1,7 +1,6 @@
 {{-- resources/views/admin/galeri/index.blade.php --}}
 @extends('layouts.admin')
-
-@section('title', 'Galeri Sekolah - SchoolAdmin Pro')
+@section('title', 'Galeri Sekolah')
 
 @section('content')
 <livewire:admin.galeri-index />

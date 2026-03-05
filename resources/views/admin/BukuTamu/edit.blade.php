@@ -86,15 +86,7 @@
                         </div>
                     </div>
 
-                    <div class="space-y-2 md:col-span-2">
-                        <label class="text-xs font-black text-slate-400 uppercase tracking-widest" for="waktu_kunjungan">Tanggal & Waktu Kedatangan</label>
-                        <div class="relative">
-                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">event_available</span>
-                            <input type="datetime-local" name="waktu_kunjungan" id="waktu_kunjungan" required
-                                   value="{{ old('waktu_kunjungan', $bukutamu->tanggal_kunjungan->format('Y-m-d') . 'T' . $bukutamu->jam_kunjungan) }}"
-                                   class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm transition-all">
-                        </div>
-                    </div>
+                    <input type="hidden" name="waktu_kunjungan" value="{{ $bukutamu->tanggal_kunjungan->format('Y-m-d') . 'T' . $bukutamu->jam_kunjungan }}">
 
                     <div class="space-y-2 md:col-span-2">
                         <label class="text-xs font-black text-slate-400 uppercase tracking-widest" for="pesan_kesan">Detail Keperluan</label>

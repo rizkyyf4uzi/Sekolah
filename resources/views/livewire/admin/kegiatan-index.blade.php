@@ -1,34 +1,42 @@
 <div>
-    <div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100 mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div class="flex flex-wrap items-center gap-4">
-            <a href="{{ route('admin.kegiatan.create') }}" class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-2xl font-bold text-sm hover:opacity-90 transition-all shadow-lg shadow-primary/20">
-                <span class="material-symbols-outlined text-lg">add_circle</span>
-                Tambah Kegiatan
-            </a>
-            <div class="relative min-w-[280px]">
-                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-                <input wire:model.live.debounce.300ms="search" class="w-full pl-12 pr-4 py-2.5 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 text-sm transition-all" placeholder="Cari nama kegiatan atau lokasi..." type="text"/>
+    <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 mb-8">
+        <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-6">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 flex-1">
+                <a href="{{ route('admin.kegiatan.create') }}" class="flex items-center justify-center gap-2 px-6 py-3.5 bg-primary text-white rounded-2xl font-bold text-sm hover:opacity-90 transition-all shadow-lg shadow-primary/20 whitespace-nowrap">
+                    <span class="material-symbols-outlined text-lg">add_circle</span>
+                    Tambah Kegiatan
+                </a>
+                <div class="relative flex-1 group">
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">search</span>
+                    <input wire:model.live.debounce.300ms="search" 
+                           class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 text-sm transition-all" 
+                           placeholder="Cari nama kegiatan atau lokasi..." type="text"/>
+                </div>
             </div>
-        </div>
-        <div class="flex items-center gap-3">
-            <select wire:model.live="kategori" class="bg-slate-50 border border-slate-100 rounded-2xl px-4 py-2.5 text-sm text-slate-600 focus:ring-primary/20 transition-all">
-                <option value="">Semua Kategori</option>
-                @foreach($categories as $cat)
-                    <option value="{{ $cat }}">{{ $cat }}</option>
-                @endforeach
-            </select>
             
-            <select wire:model.live="status" class="bg-slate-50 border border-slate-100 rounded-2xl px-4 py-2.5 text-sm text-slate-600 focus:ring-primary/20 transition-all">
-                <option value="">Semua Status</option>
-                <option value="published">Public</option>
-                <option value="draft">Draft</option>
-            </select>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <div class="flex flex-1 gap-3">
+                    <select wire:model.live="kategori" class="flex-1 sm:w-44 bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3.5 text-sm text-slate-600 focus:ring-2 focus:ring-primary/20 transition-all outline-none">
+                        <option value="">Semua Kategori</option>
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat }}">{{ $cat }}</option>
+                        @endforeach
+                    </select>
+                    
+                    <select wire:model.live="status" class="flex-1 sm:w-36 bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3.5 text-sm text-slate-600 focus:ring-2 focus:ring-primary/20 transition-all outline-none">
+                        <option value="">Semua Status</option>
+                        <option value="published">Public</option>
+                        <option value="draft">Draft</option>
+                    </select>
+                </div>
 
-            @if($search || $kategori || $status)
-                <button wire:click="resetFilters" class="p-2.5 text-red-500 hover:bg-red-50 rounded-xl transition-all" title="Reset Filter">
-                    <span class="material-symbols-outlined">filter_alt_off</span>
-                </button>
-            @endif
+                @if($search || $kategori || $status)
+                    <button wire:click="resetFilters" class="flex items-center justify-center gap-2 px-4 py-3.5 text-red-500 bg-red-50 hover:bg-red-100 rounded-2xl transition-all sm:w-auto" title="Reset Filter">
+                        <span class="material-symbols-outlined">filter_alt_off</span>
+                        <span class="sm:hidden text-xs font-bold uppercase tracking-wider">Reset</span>
+                    </button>
+                @endif
+            </div>
         </div>
     </div>
 

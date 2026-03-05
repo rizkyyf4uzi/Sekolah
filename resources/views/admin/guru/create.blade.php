@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Tambah Data Guru - SchoolAdmin Pro')
+@section('title', 'Tambah Data Guru - SchoolAdmin&nbsp;Pro')
 
 @section('content')
 <div class="min-h-screen bg-background-light dark:bg-background-dark p-8 pb-8">

@@ -151,14 +151,12 @@
 
                 @hasSection('title')
                 <div class="mb-6">
-                    <h1 class="text-xl lg:text-2xl font-bold text-slate-800 dark:text-slate-100">@yield('title')</h1>
-                    @hasSection('breadcrumb')
-                    <div class="flex items-center gap-2 mt-1 text-sm text-slate-500 dark:text-slate-400">
-                        <a href="{{ route('admin.dashboard') }}" class="hover:text-primary">Dashboard</a>
-                        <span class="material-symbols-outlined text-xs">chevron_right</span>
-                        <span>@yield('breadcrumb')</span>
+                    <h1 class="text-lg sm:text-xl lg:text-2xl font-bold text-slate-800 dark:text-slate-100 leading-tight">@yield('title')</h1>
+                    <div class="flex flex-wrap items-center gap-x-2 gap-y-1 mt-2 text-sm text-slate-500 dark:text-slate-400">
+                        <a href="{{ route('admin.dashboard') }}" class="hover:text-primary transition-colors shrink-0">Dashboard</a>
+                        <span class="material-symbols-outlined text-[14px] shrink-0">chevron_right</span>
+                        <span class="font-medium text-slate-600 dark:text-slate-300">@yield('breadcrumb')</span>
                     </div>
-                    @endif
                 </div>
                 @endif
 

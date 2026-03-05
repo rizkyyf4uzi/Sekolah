@@ -249,21 +249,26 @@
                     </p>
                 </div>
 
-                {{-- Action Buttons (bagian dari aliran konten, BUKAN fixed) --}}
-                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex flex-col gap-3">
-                    <button type="submit"
-                            id="btnSubmit"
-                            class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-bold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed">
-                        <span class="material-symbols-outlined text-lg">save</span>
-                        Simpan Album
-                    </button>
-                    <a href="{{ route('admin.galeri.index') }}"
-                       class="w-full flex items-center justify-center px-6 py-2.5 text-sm font-bold text-slate-500 hover:text-primary border border-slate-200 rounded-xl bg-slate-50 hover:bg-lavender transition-all">
-                        Batal
-                    </a>
+                {{-- Action Buttons (Sticky on mobile, inline on desktop) --}}
+                <div class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-slate-200 z-50 lg:relative lg:p-0 lg:bg-transparent lg:border-none lg:z-auto">
+                    <div class="bg-white lg:rounded-2xl lg:p-5 lg:shadow-sm lg:border lg:border-slate-100 flex flex-col sm:flex-row lg:flex-col gap-3 max-w-5xl mx-auto">
+                        <button type="submit"
+                                id="btnSubmit"
+                                class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-bold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2 lg:order-1">
+                            <span class="material-symbols-outlined text-lg">save</span>
+                            Simpan Album
+                        </button>
+                        <a href="{{ route('admin.galeri.index') }}"
+                           class="w-full flex items-center justify-center px-6 py-3 lg:py-2.5 text-sm font-bold text-slate-500 hover:text-primary border border-slate-200 rounded-xl bg-slate-50 hover:bg-lavender transition-all order-2 sm:order-1 lg:order-2">
+                            Batal
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
+        
+        {{-- Spacer for mobile sticky footer so content doesn't get hidden behind it --}}
+        <div class="h-24 lg:hidden"></div>
     </div>
 </form>
 @endsection
